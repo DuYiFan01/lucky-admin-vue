@@ -1,4 +1,4 @@
-package cn.anlucky.system.cnofig;
+package cn.anlucky.system.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

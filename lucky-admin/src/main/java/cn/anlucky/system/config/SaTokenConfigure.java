@@ -1,4 +1,4 @@
-package cn.anlucky.system.cnofig;
+package cn.anlucky.system.config;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.jwt.StpLogicJwtForSimple;

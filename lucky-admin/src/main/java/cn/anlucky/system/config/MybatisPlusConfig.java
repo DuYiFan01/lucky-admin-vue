@@ -1,4 +1,4 @@
-package cn.anlucky.system.cnofig;
+package cn.anlucky.system.config;
 
 import cn.anlucky.system.utils.Sa;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
