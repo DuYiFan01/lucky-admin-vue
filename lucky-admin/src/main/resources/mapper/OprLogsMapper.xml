@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.anlucky.system.mapper.OprLogsMapper">
+
+        <!-- 通用查询映射结果 -->
+        <resultMap id="BaseResultMap" type="cn.anlucky.system.pojo.OprLogs">
+                    <id column="id" property="id" />
+                    <result column="title" property="title" />
+                    <result column="business_type" property="businessType" />
+                    <result column="method_name" property="methodName" />
+                    <result column="request_method" property="requestMethod" />
+                    <result column="username" property="username" />
+                    <result column="url" property="url" />
+                    <result column="ip" property="ip" />
+                    <result column="param" property="param" />
+                    <result column="result" property="result" />
+                    <result column="status" property="status" />
+                    <result column="error_msg" property="errorMsg" />
+                    <result column="start_time" property="startTime" />
+                    <result column="cost_time" property="costTime" />
+        </resultMap>
+
+        <!-- 通用查询结果列 -->
+        <sql id="Base_Column_List">
+                id, title, business_type, method_name, request_method, username, url, ip, param, result, `status`, error_msg, start_time, cost_time
+        </sql>
+
+</mapper>

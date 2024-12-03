@@ -1,8 +1,10 @@
 package cn.anlucky;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@MapperScan("cn.anlucky.*.mapper")
 @SpringBootApplication
 public class LuckyAdminApplication {
 

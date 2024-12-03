@@ -1,14 +1,12 @@
 server:
   port: 8080
   servlet:
-    context-path: /
+    context-path: /dev-api
     encoding:
       charset: utf-8
 spring:
   application:
-    name: lucky-admin
-  profiles:
-    active: dev
+    name: lucky-admin-vue
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -45,5 +43,5 @@ sa-token:
   # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
   token-style: uuid
   # 是否输出操作日志
-  is-log: true
-  jwt-secret-key: luckyDu
+  is-log: false
+  jwt-secret-key: luckyAdmin
