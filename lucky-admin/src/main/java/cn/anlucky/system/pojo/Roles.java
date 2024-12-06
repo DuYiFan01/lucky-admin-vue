@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -57,4 +58,8 @@ public class Roles implements Serializable {
     @ApiModelProperty("更新人")
     @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
+
+    @ApiModelProperty("角色拥有的菜单权限")
+    @TableField(exist = false)
+    private List<Long> menus;
 }

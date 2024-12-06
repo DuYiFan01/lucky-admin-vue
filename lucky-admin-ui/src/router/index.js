@@ -2,10 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 /* Layout */
 import Layout from '@/layout'
-import ParentView from '@/components/ParentView/index.vue'
 Vue.use(Router)
-
-
 
 /**
  * Note: 路由配置项
@@ -59,155 +56,85 @@ export const constantRoutes = [
   }
 
 ]
-
-/**
- * 动态路由，根据用户配置生成
- */
-// export const asyncRoutes = [
-
-//   // /example
-//   {
-//     path: '/system',
-//     component: Layout,
-//     redirect: 'noRedirect',
-//     name: 'system',
-//     hidden: false,
-//     alwaysShow: true,
-//     meta: { title: '系统管理', icon: 'el-icon-s-help', noCache: true, },
-//     children: [
-//       {
-//         path: '/system/users',
-//         name: 'Users',
-//         component: () => import('@/views/system/users/index'),
-//         meta: { title: '用户管理', icon: 'table', roles: ['admin'] }
-//       },
-//       {
-//         path: 'menus',
-//         name: 'Menus',
-//         component: () => import('@/views/system/menus/index'),
-//         meta: { title: '菜单管理', icon: 'tree', roles: ['admin'] }
-//       },
-//       {
-//         path: 'logs',
-//         name: 'Logs',
-//         component: () => import('@/views/system/logs/index'),
-//         meta: { title: '操作日志', icon: 'tree', roles: ['admin'] },
-//       },
-//       {
-//         path: 'other',
-//         name: 'other',
-//         component: ParentView,
-//         redirect: 'noRedirect',
-//         hidden: false,
-//         alwaysShow: true,
-//         meta: { title: '操作日志', icon: 'tree', },
-//         children: [
-//           {
-//             path: 'other1',
-//             name: 'other1',
-//             component: () => import('@/views/system/logs/index'),
-//             meta: { title: '操作日志', icon: 'tree', roles: ['admin'] },
-//           },
-//         ]
-//       },
-
-
-//     ]
-//   },
-//   {
-//     "name": "Http://ruoyi.vip",
-//     "path": "http://ruoyi.vip",
-//     "hidden": false,
-//     "component": Layout,
-//     "meta": {
-//       "title": "若依官网",
-//       "icon": "guide",
-//       "noCache": false,
-//       "link": "http://ruoyi.vip"
-//     }
-//   },
-//   // 404 page must be placed at the end !!!
-//   { path: '*', redirect: '/404', hidden: true }
-// ]
 export const asyncRoutes = [
-  {
-    "alwaysShow": true,
-    "children": [
-      {
-        "alwaysShow": false,
-        "children": [
-          
-        ],
-        "component":() => import('@/views/system/users/index'),
-        "hidden": false,
-        "meta": {
-          "icon": "#",
-          "noCache": false,
-          "title": "用户管理"
-        },
-        "name": "users",
-        "path": "/system/users",
-        "redirect": null
-      },
-      {
-        "alwaysShow": true,
-        "children": [
-          
-        ],
-        "component": import('@/views/system/menus/index'),
-        "hidden": false,
-        "meta": {
-          "icon": "#",
-          "noCache": false,
-          "title": "菜单管理"
-        },
-        "name": "menus",
-        "path": "/system/menus",
-        "redirect": "noRedirect"
-      },
-      {
-        "alwaysShow": true,
-        "children": [
-          {
-            "alwaysShow": true,
-            "children": [
-              
-            ],
-            "component": import('@/views/system/logs/operlog/index'),
-            "hidden": false,
-            "meta": {
-              "icon": "#",
-              "noCache": false,
-              "title": "操作日志"
-            },
-            "name": "operlog",
-            "path": "/system/logs/operlog",
-            "redirect": "noRedirect"
-          }
-        ],
-        "component": ParentView,
-        "hidden": false,
-        "meta": {
-          "icon": "#",
-          "noCache": false,
-          "title": "日志管理"
-        },
-        "name": "logs",
-        "path": "/system/logs",
-        "redirect": "noRedirect"
-      }
-    ],
-    "component": Layout,
-    "hidden": false,
-    "meta": {
-      "icon": "#",
-      "noCache": false,
-      "title": "系统管理"
-    },
-    "name": "system",
-    "path": "/system",
-    "redirect": "noRedirect"
-  }
+  // {
+  //   'alwaysShow': true,
+  //   'children': [
+  //     {
+  //       'alwaysShow': false,
+  //       'children': [
+
+  //       ],
+  //       'component': () => import('@/views/system/users/index'),
+  //       'hidden': false,
+  //       'meta': {
+  //         'icon': '#',
+  //         'noCache': false,
+  //         'title': '用户管理'
+  //       },
+  //       'name': 'users',
+  //       'path': '/system/users',
+  //       'redirect': null
+  //     },
+  //     {
+  //       'alwaysShow': true,
+  //       'children': [
+
+  //       ],
+  //       'component': import('@/views/system/menus/index'),
+  //       'hidden': false,
+  //       'meta': {
+  //         'icon': '#',
+  //         'noCache': false,
+  //         'title': '菜单管理'
+  //       },
+  //       'name': 'menus',
+  //       'path': '/system/menus',
+  //       'redirect': 'noRedirect'
+  //     },
+  //     {
+  //       'alwaysShow': true,
+  //       'children': [
+  //         {
+  //           'alwaysShow': true,
+  //           'children': [
+
+  //           ],
+  //           'component': import('@/views/system/logs/operlog/index'),
+  //           'hidden': false,
+  //           'meta': {
+  //             'icon': '#',
+  //             'noCache': false,
+  //             'title': '操作日志'
+  //           },
+  //           'name': 'operlog',
+  //           'path': '/system/logs/operlog',
+  //           'redirect': 'noRedirect'
+  //         }
+  //       ],
+  //       'component': ParentView,
+  //       'hidden': false,
+  //       'meta': {
+  //         'icon': '#',
+  //         'noCache': false,
+  //         'title': '日志管理'
+  //       },
+  //       'name': 'logs',
+  //       'path': '/system/logs',
+  //       'redirect': 'noRedirect'
+  //     }
+  //   ],
+  //   'component': Layout,
+  //   'hidden': false,
+  //   'meta': {
+  //     'icon': '#',
+  //     'noCache': false,
+  //     'title': '系统管理'
+  //   },
+  //   'name': 'system',
+  //   'path': '/system',
+  //   'redirect': 'noRedirect'
+  // }
 ]
 const createRouter = () => new Router({
   // mode: 'history', // require service support

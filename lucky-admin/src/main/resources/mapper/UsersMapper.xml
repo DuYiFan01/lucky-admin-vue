@@ -19,5 +19,30 @@
         <sql id="Base_Column_List">
                 id, username, `password`, email, create_time, create_by, update_time, update_by, del_flag
         </sql>
+    <select id="getPermissionList" resultType="java.lang.String">
+        SELECT
+            m.roles
+        FROM
+            user_roles ur
+                INNER JOIN
+            roles_menus rm ON rm.role_id = ur.role_id
+                INNER JOIN
+            menus m ON m.id = rm.menu_id
+                AND m.menu_type = 'F'
+        WHERE
+            ur.user_id = #{loginId}
+    </select>
+
+    <select id="getRoleList" resultType="java.lang.String">
+        select
+            r.name
+        from
+            roles r
+                inner join
+            user_roles ur on r.id = ur.role_id
+        where
+            ur.user_id = #{loginId}
+    </select>
+
 
 </mapper>

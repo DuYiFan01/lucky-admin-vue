@@ -53,6 +53,14 @@ public class Sa {
     public static String getLoginId() {
         return StpUtil.getLoginId().toString();
     }
+    /**
+     * 获取当前登录的loginId
+     *
+     * @return
+     */
+    public static Long getLoginIdAsLong() {
+        return StpUtil.getLoginIdAsLong();
+    }
 
     /**
      * 注销当前登录

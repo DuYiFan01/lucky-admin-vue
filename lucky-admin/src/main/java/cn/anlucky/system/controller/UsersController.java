@@ -1,5 +1,6 @@
 package cn.anlucky.system.controller;
 
+
 import cn.anlucky.system.annotation.Log;
 import cn.anlucky.system.base.controller.BaseController;
 import cn.anlucky.system.enums.BusinessType;
@@ -7,21 +8,24 @@ import cn.anlucky.system.exception.CustomException;
 import cn.anlucky.system.page.vo.PageDataVo;
 import cn.anlucky.system.pojo.Users;
 import cn.anlucky.system.service.UsersService;
+import cn.anlucky.system.vo.AuthRoleVo;
+import cn.anlucky.system.vo.AuthUserVo;
+import cn.anlucky.system.vo.SaveGrantUserVo;
+import cn.anlucky.system.vo.SaveGrantVo;
 import cn.anlucky.vo.R;
-import org.springframework.web.bind.annotation.*;
-
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-
 /**
  * 用户表 前端控制器
  *
  * @author yifan.du
- * @since 2024-12-03 14:16:29
+ * @since 2024-12-04 11:23:54
  */
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class UsersController extends BaseController {
      * 查询所有
      * @return
      */
+    @SaCheckPermission("system::users::list")
     @PostMapping("/list")
     public R list() {
         List<Users> list = usersService.list();
@@ -45,6 +50,7 @@ public class UsersController extends BaseController {
     * @param users
     * @return
     */
+    @SaCheckPermission("system::users::list")
     @PostMapping("/pageByParams")
     public R listByPage(@RequestBody Users users) {
         startPage();
@@ -58,6 +64,7 @@ public class UsersController extends BaseController {
     * @param id
     * @return
     */
+    @SaCheckPermission("system::users::list")
     @GetMapping("/get/{id}")
     public R getById(@PathVariable(name = "id") Serializable id) {
         Users users = usersService.getById(id);
@@ -69,6 +76,7 @@ public class UsersController extends BaseController {
     * @param users
     * @return
     */
+    @SaCheckPermission("system::users::insert")
     @Log(title = "用户表", businessType = BusinessType.INSERT)
     @PostMapping("/save")
     public R save(@RequestBody Users users) {
@@ -84,6 +92,7 @@ public class UsersController extends BaseController {
     * @param users
     * @return
     */
+    @SaCheckPermission("system::users::update")
     @Log(title = "用户表", businessType = BusinessType.UPDATE)
     @PostMapping("/updateAllById")
     public R updateAllById(@RequestBody Users users) {
@@ -96,6 +105,7 @@ public class UsersController extends BaseController {
     * @param users
     * @return
     */
+    @SaCheckPermission("system::users::update")
     @Log(title = "用户表", businessType = BusinessType.UPDATE)
     @PostMapping("/updateSpecifyById")
     public R updateSpecifyById(@RequestBody Users users) {
@@ -108,6 +118,7 @@ public class UsersController extends BaseController {
     * @param ids
     * @return
     */
+    @SaCheckPermission("system::users::delete")
     @Log(title = "用户表", businessType = BusinessType.DELETE)
     @GetMapping("/delete/{ids}")
     public R deleteByIds(@PathVariable(name = "ids") Serializable[] ids) {

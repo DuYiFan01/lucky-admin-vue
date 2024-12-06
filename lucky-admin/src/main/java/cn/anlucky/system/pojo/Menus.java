@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -104,4 +105,12 @@ public class Menus implements Serializable {
     @ApiModelProperty("备注")
     @TableField("remark")
     private String remark;
+
+    @ApiModelProperty("用户ID")
+    @TableField(exist = false)
+    private String uid;
+
+    @ApiModelProperty("子菜单")
+    @TableField(exist = false)
+    private List<Menus> children;
 }

@@ -38,12 +38,6 @@ service.interceptors.response.use(
    * If you want to get http information such as headers or status
    * Please return  response => response
   */
-
-  /**
-   * Determine the request status by custom code
-   * Here is just an example
-   * You can also judge the status by HTTP Status Code
-   */
   response => {
     const res = response.data
 
@@ -61,7 +55,6 @@ service.interceptors.response.use(
       })
       return Promise.reject(new Error(res.message || 'Error'))
     }
-
     // 不是未登录状态
     // 如果Code 小于 0 表示失败 则弹出错误信息
     if (res.code < 0) {
@@ -81,7 +74,7 @@ service.interceptors.response.use(
     Message({
       message: error.message,
       type: 'error',
-      duration: 5 * 1000
+      duration: 30 * 1000
     })
     return Promise.reject(error)
   }

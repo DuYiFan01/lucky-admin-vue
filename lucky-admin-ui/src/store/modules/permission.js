@@ -1,4 +1,4 @@
-import { asyncRoutes, constantRoutes } from '@/router'
+import { constantRoutes } from '@/router'
 import store from '@/store'
 
 /**
@@ -49,7 +49,6 @@ const mutations = {
 const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
-      let accessedRoutes
       // 如果是管理员，拥有所有的路由权限
       // if (roles.includes('admin')) {
       //   accessedRoutes = asyncRoutes || []
@@ -58,7 +57,7 @@ const actions = {
       //   accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       // }
       // accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-      accessedRoutes = filterAsyncRoutes(store.getters.routersTree, roles)
+      const accessedRoutes = filterAsyncRoutes(store.getters.routersTree, roles)
       // accessedRoutes = store.getters.routersTree
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)

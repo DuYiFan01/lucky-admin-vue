@@ -7,7 +7,13 @@ import cn.anlucky.system.exception.CustomException;
 import cn.anlucky.system.page.vo.PageDataVo;
 import cn.anlucky.system.pojo.Roles;
 import cn.anlucky.system.service.RolesService;
+import cn.anlucky.system.utils.Sa;
+import cn.anlucky.system.vo.AuthRoleVo;
+import cn.anlucky.system.vo.AuthUserVo;
+import cn.anlucky.system.vo.SaveGrantUserVo;
+import cn.anlucky.system.vo.SaveGrantVo;
 import cn.anlucky.vo.R;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -31,20 +37,11 @@ public class RolesController extends BaseController {
     private final RolesService rolesService;
 
     /**
-     * 查询所有
-     * @return
-     */
-    @PostMapping("/list")
-    public R list() {
-        List<Roles> list = rolesService.list();
-        return R.ok(list);
-    }
-
-    /**
     * 条件分页查询
     * @param roles
     * @return
     */
+    @SaCheckPermission("system::role::list")
     @PostMapping("/pageByParams")
     public R listByPage(@RequestBody Roles roles) {
         startPage();
@@ -58,6 +55,7 @@ public class RolesController extends BaseController {
     * @param id
     * @return
     */
+    @SaCheckPermission("system::role::list")
     @GetMapping("/get/{id}")
     public R getById(@PathVariable(name = "id") Serializable id) {
         Roles roles = rolesService.getById(id);
@@ -71,11 +69,12 @@ public class RolesController extends BaseController {
     */
     @Log(title = "角色表", businessType = BusinessType.INSERT)
     @PostMapping("/save")
+    @SaCheckPermission("system::role::insert")
     public R save(@RequestBody Roles roles) {
         if(rolesService.getById(roles.getId())!=null){
             throw new CustomException("ID已存在");
         }
-        rolesService.save(roles);
+        rolesService.saveRoleAndRoleMenus(roles);
         return R.ok("添加成功");
     }
 
@@ -86,20 +85,9 @@ public class RolesController extends BaseController {
     */
     @Log(title = "角色表", businessType = BusinessType.UPDATE)
     @PostMapping("/updateAllById")
+    @SaCheckPermission("system::role::update")
     public R updateAllById(@RequestBody Roles roles) {
         rolesService.updateAllById(roles);
-        return R.ok("修改成功");
-    }
-
-    /**
-    * 修改指定字段为新值
-    * @param roles
-    * @return
-    */
-    @Log(title = "角色表", businessType = BusinessType.UPDATE)
-    @PostMapping("/updateSpecifyById")
-    public R updateSpecifyById(@RequestBody Roles roles) {
-        rolesService.updateSpecifyById(roles);
         return R.ok("修改成功");
     }
 
@@ -110,12 +98,62 @@ public class RolesController extends BaseController {
     */
     @Log(title = "角色表", businessType = BusinessType.DELETE)
     @GetMapping("/delete/{ids}")
-    public R deleteByIds(@PathVariable(name = "ids") Serializable[] ids) {
+    @SaCheckPermission("system::role::delete")
+    public R deleteByIds(@PathVariable(name = "ids") Long[] ids) {
         if (ids.length <= 0){
             throw new CustomException("请选择要删除的数据");
         }
-        rolesService.removeBatchByIds(Arrays.asList(ids));
+        rolesService.deleteRoelsBatch(Arrays.asList(ids));
         return R.ok("删除成功");
+    }
+
+    /**
+     * 查询当前角色分配的用户列表
+     * @param roleId
+     * @return
+     */
+    @GetMapping("/getGrantByRoleId/{roleId}")
+    @SaCheckPermission("system::role::grant")
+    public R getGrantByRoleId(@PathVariable(name = "roleId") Long roleId) {
+        AuthUserVo authUserVo = rolesService.getUsersByRoleId(roleId);
+        return R.ok(authUserVo);
+    }
+
+    /**
+     * 查询当前用户所拥有的角色
+     * @param userId
+     * @return
+     */
+    @SaCheckPermission("system::users::grant")
+    @GetMapping("/getGrantByUserId/{userId}")
+    public R getGrantByUserId(@PathVariable(name = "userId") Long userId) {
+        AuthRoleVo authUserVo = rolesService.getRolesByUserId(userId);
+        return R.ok(authUserVo);
+    }
+
+
+    /**
+     * 为角色分配用户
+     * @param saveGrantVo
+     * @return
+     */
+    @PostMapping("/saveGrant")
+    @SaCheckPermission("system::role::grant")
+    public R saveGrant(@RequestBody SaveGrantVo saveGrantVo) {
+        rolesService.saveGrant(saveGrantVo);
+        return R.ok("添加成功");
+    }
+
+    /**
+     * 为用户分配角色
+     * @param saveGrantUserVo
+     * @return
+     */
+    @SaCheckPermission("system::users::grant")
+    @PostMapping("/saveGrantByUser")
+    public R saveGrantByUser(@RequestBody SaveGrantUserVo saveGrantUserVo) {
+        rolesService.saveGrantByUser(saveGrantUserVo);
+        return R.ok("添加成功");
     }
 
 }

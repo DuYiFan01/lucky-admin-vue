@@ -1,15 +1,24 @@
 package cn.anlucky.system.service.impl;
 
 import cn.anlucky.system.exception.CustomException;
+import cn.anlucky.system.pojo.Roles;
+import cn.anlucky.system.pojo.UserRoles;
 import cn.anlucky.system.pojo.Users;
 import cn.anlucky.system.mapper.UsersMapper;
+import cn.anlucky.system.service.RolesService;
+import cn.anlucky.system.service.UserRolesService;
 import cn.anlucky.system.service.UsersService;
+import cn.anlucky.system.vo.AuthRoleVo;
+import cn.anlucky.system.vo.SaveGrantUserVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,6 +31,9 @@ import java.util.Objects;
  */
 @Service
 public class UsersServiceImp extends ServiceImpl<UsersMapper, Users> implements UsersService {
+
+    @Autowired
+    private UserRolesService userRolesService;
 
 
     /**

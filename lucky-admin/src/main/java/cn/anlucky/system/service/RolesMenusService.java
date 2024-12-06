@@ -14,4 +14,11 @@ import java.util.List;
  */
 public interface RolesMenusService extends IService<RolesMenus> {
 
+    /**
+     * 根据角色ID查询菜单ID
+     * @param roleId
+     * @return
+     */
+    public List<RolesMenus> getRolesMenusByRoleId(Long roleId);
+
 }

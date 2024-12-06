@@ -8,6 +8,7 @@ import cn.anlucky.system.page.vo.PageDataVo;
 import cn.anlucky.system.pojo.OprLogs;
 import cn.anlucky.system.service.OprLogsService;
 import cn.anlucky.vo.R;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/system/opr-logs")
+@RequestMapping("/system/oprLogs")
 public class OprLogsController extends BaseController {
 
     private final OprLogsService oprLogsService;
@@ -34,6 +35,7 @@ public class OprLogsController extends BaseController {
     * @param oprLogs
     * @return
     */
+    @SaCheckPermission("system::logs::oprLogs::list")
     @PostMapping("/pageByParams")
     public R listByPage(@RequestBody OprLogs oprLogs) {
         startPage();
@@ -47,6 +49,7 @@ public class OprLogsController extends BaseController {
     * @param ids
     * @return
     */
+    @SaCheckPermission("system::logs::oprLogs::delete")
     @Log(title = "操作日志记录", businessType = BusinessType.DELETE)
     @GetMapping("/delete/{ids}")
     public R deleteByIds(@PathVariable(name = "ids") Serializable[] ids) {

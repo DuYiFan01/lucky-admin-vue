@@ -25,9 +25,107 @@
                     <result column="remark" property="remark" />
         </resultMap>
 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="menusTree" type="cn.anlucky.system.pojo.Menus">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="title" property="title" />
+        <result column="parent_id" property="parentId" />
+        <result column="order_num" property="orderNum" />
+        <result column="path" property="path" />
+        <result column="component" property="component" />
+        <result column="query" property="query" />
+        <result column="is_frame" property="isFrame" />
+        <result column="is_cache" property="isCache" />
+        <result column="menu_type" property="menuType" />
+        <result column="visible" property="visible" />
+        <result column="roles" property="roles" />
+        <result column="icon" property="icon" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="remark" property="remark" />
+        <association property="uid" javaType="string"/>
+        <collection property="children" column="{userId=uid,parentId=id}" select="getMenusByParentId"/>
+    </resultMap>
+
+
+
         <!-- 通用查询结果列 -->
         <sql id="Base_Column_List">
                 id, `name`, title, parent_id, order_num, `path`, `component`, `query`, is_frame, is_cache, menu_type, `visible`, roles, icon, create_time, create_by, update_time, update_by, remark
         </sql>
+
+    <!--根据父级菜单ID获取当前用户的其子菜单和目录-->
+    <select id="getMenusByParentId" resultMap="menusTree">
+        SELECT
+            ur.user_id as uid,
+            m.id,
+            m.`name`,
+            m.title,
+            m.parent_id,
+            m.order_num,
+            m.`path`,
+            m.`component`,
+            m.`query`,
+            m.is_frame,
+            m.is_cache,
+            m.menu_type,
+            m.`visible`,
+            m.roles,
+            m.icon,
+            m.create_by,
+            m.create_time,
+            m.update_by,
+            m.update_time,
+            m.remark
+        FROM
+            menus m
+                INNER JOIN roles_menus rm ON rm.menu_id = m.id
+                INNER JOIN user_roles ur ON ur.role_id = rm.role_id
+                AND ur.user_id = #{userId}
+        WHERE
+            m.parent_id = #{parentId}
+          AND m.menu_type IN ( 'M', 'C' )
+        ORDER BY
+            m.order_num ASC
+    </select>
+
+    <!--获取父级菜单目录-->
+    <select id="getMenusTreeByUserId" resultMap="menusTree">
+        SELECT
+            ur.user_id as uid,
+            m.id,
+            m.`name`,
+            m.title,
+            m.parent_id,
+            m.order_num,
+            m.`path`,
+            m.`component`,
+            m.`query`,
+            m.is_frame,
+            m.is_cache,
+            m.menu_type,
+            m.`visible`,
+            m.roles,
+            m.icon,
+            m.create_by,
+            m.create_time,
+            m.update_by,
+            m.update_time,
+            m.remark
+        FROM
+            menus m
+                INNER JOIN roles_menus rm ON rm.menu_id = m.id
+                INNER JOIN user_roles ur ON ur.role_id = rm.role_id
+                AND ur.user_id = #{userId}
+        WHERE
+            m.parent_id = 0
+          AND m.menu_type IN ( 'M', 'C' )
+        ORDER BY
+            m.order_num ASC
+    </select>
+
 
 </mapper>

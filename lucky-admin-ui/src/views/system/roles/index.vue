@@ -1,31 +1,37 @@
 <template>
   <div class="user-management">
-    <div class="search-bar">
+    <div v-permission="['system::role::list']" class="search-bar">
       <div class="grid-item">
         <span>
           角色名称:
         </span>
-        <el-input v-model="searchForm.name" placeholder="请输入角色名称" style="width: 200px; margin-right: 10px;" />
+        <el-input v-model="searchForm.name" placeholder="请输入角色名称" style="width: 200px;" />
       </div>
       <div class="grid-item">
         <span>
           角色描述:
         </span>
-        <el-input v-model="searchForm.description" placeholder="请输入角色描述" style="width: 200px; margin-right: 10px;" />
+        <el-input v-model="searchForm.description" placeholder="请输入角色描述" style="width: 200px;" />
       </div>
       <div class="grid-item">
-        <el-button type="primary" @click="handleSearch">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
     </div>
-    <div class="button-bar">
-      <el-button type="primary" @click="handleAdd">新增项目</el-button>
-      <el-button type="danger" @click="handleBatchDelete">批量删除</el-button>
-      <el-button type="success" @click="handleImport">导入</el-button>
-      <el-button type="warning" @click="handleExport">导出</el-button>
-      <el-button type="info" @click="handleRefresh">刷新</el-button>
+    <div v-permission="['system::role::insert','system::role::delete','system::role::import','system::role::export','system::role::list']" class="button-bar">
+      <el-button v-permission="['system::role::insert']" :type="buttonBar.insertType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleAdd">新增项目</el-button>
+      <el-button v-permission="['system::role::delete']" :type="buttonBar.deleteType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleBatchDelete">批量删除</el-button>
+      <el-button v-permission="['system::role::import']" :type="buttonBar.importType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleImport">导入</el-button>
+      <el-button v-permission="['system::role::export']" :type="buttonBar.exportType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleExport">导出</el-button>
+      <el-button v-permission="['system::role::list']" :type="buttonBar.reFreshType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleRefresh">刷新</el-button>
     </div>
-    <el-table v-loading.fullscreen.lock="tableLoading" :data="tableData" style="width: 100%" border max-height="560"
-      @selection-change="handleSelectionChange">
+    <el-table
+      v-loading.fullscreen.lock="tableLoading"
+      :data="tableData"
+      style="width: 100%"
+      border
+      max-height="560"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="55" />
       <el-table-column prop="id" label="角色ID" v-bind="columnProps" />
       <el-table-column prop="name" label="角色名称" v-bind="columnProps" />
@@ -34,23 +40,41 @@
       <el-table-column prop="createBy" label="创建人" v-bind="columnProps" />
       <el-table-column prop="updateTime" label="更新时间" v-bind="columnProps" />
       <el-table-column prop="updateBy" label="更新人" v-bind="columnProps" />
-      <el-table-column prop="delFlag" label="逻辑删除标志，0-未删除，1-已删除" v-bind="columnProps" />
-      <el-table-column label="操作" width="300" fixed="right" :header-align="tableConfig.headerAlign" align="center">
+      <el-table-column
+        v-if="checkPermission(['system::role::grant','system::role::update','system::role::delete'])"
+        label="操作"
+        width="200"
+        fixed="right"
+        :header-align="tableConfig.headerAlign"
+        align="center"
+      >
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="handleAssUser(scope.row)">分配用户</el-button>
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+          <el-button v-permission="['system::role::grant']" :size="toolBar.size" :type="toolBar.updateType" icon="el-icon-user" @click="handleAssUser(scope.row)">分配用户</el-button>
+          <el-button v-permission="['system::role::update']" :size="toolBar.size" :type="toolBar.updateType" :icon="toolBar.updateIcon" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button v-permission="['system::role::delete']" :size="toolBar.size" :type="toolBar.deleteType" :icon="toolBar.deleteIcon" @click="handleDelete(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div class="pagination">
-      <el-pagination :current-page="currentPage" :page-sizes="[1, 10, 20, 50, 100]" :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-        @current-change="handleCurrentChange" />
+      <el-pagination
+        :current-page="currentPage"
+        :page-sizes="[1, 10, 20, 50, 100]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
     <!-- 新增/编辑用户对话框 -->
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="500px" :close-on-click-modal="false" center
-      @opened="dialogOpened(form)">
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      width="500px"
+      :close-on-click-modal="false"
+      center
+      @opened="dialogOpened(form)"
+    >
       <el-form ref="form" :model="form" :rules="rules">
         <el-form-item label="角色名称" prop="name">
           <el-input v-model="form.name" autocomplete="off" />
@@ -59,15 +83,24 @@
           <el-input v-model="form.description" autocomplete="off" />
         </el-form-item>
         <el-form-item v-show="menuShow" label="分配权限" prop="menus">
-          <el-input placeholder="请输入权限名称" v-model="filterText">
-          </el-input>
+          <el-input v-model="filterText" placeholder="请输入权限名称" />
           <el-button size="mini" type="primary" @click="handleCheckAll">全选/全不选</el-button>
+          <el-button size="mini" type="primary" @click="handleExpand(form.menus)">展开/折叠</el-button>
           <el-button size="mini" type="danger" @click="handleResetRole(form.menus)">重置</el-button>
           <el-button size="mini" type="info" @click="handleRefresh">刷新</el-button>
-          <el-tree class="filter-tree" ref="menuTree" :data="menusTree" node-key="id" show-checkbox :check-strictly=true
-            :props="defaultProps" :default-expand-all=isExpand :filter-node-method="filterMenusTree"
-            @check="handleCheck">
-          </el-tree>
+          <el-tree
+            ref="menuTree"
+            class="filter-tree"
+            style="height: 200px; overflow: auto;"
+            :data="menusTree"
+            node-key="id"
+            show-checkbox
+            :check-strictly="true"
+            :props="defaultProps"
+            :default-expand-all="isExpand"
+            :filter-node-method="filterMenusTree"
+            @check="handleCheck"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -76,17 +109,31 @@
       </div>
     </el-dialog>
     <!-- 角色分配用户对话框 -->
-    <el-dialog :title="dialogByRoleTitle" :visible.sync="dialogVisibleByRole" width="800px"
-      :close-on-click-modal="false" center >
-      <div style="text-align: center;">
-        <el-transfer style="text-align: left; display: inline-block" filterable :filter-method="transferFilter"
-          filter-placeholder="请输入用户名" v-model="transferValue" :data="transferData" :button-texts="['取消', '授权']"
-          :titles="['未授权用户', '已授权用户']" :props="{
+    <el-dialog
+      :title="dialogByRoleTitle"
+      :visible.sync="dialogVisibleByRole"
+      width="800px"
+      :close-on-click-modal="false"
+      center
+    >
+
+      <el-form ref="form" :model="formByRole" style="text-align: center;">
+        <el-transfer
+          v-model="transferValue"
+          style="text-align: left; display: inline-block"
+          filterable
+          :filter-method="transferFilter"
+          filter-placeholder="请输入用户名"
+          :data="transferData"
+          :button-texts="['取消', '授权']"
+          :titles="['未授权用户', '已授权用户']"
+          :props="{
             key: 'id',
             label: 'username'
-          }">
-        </el-transfer>
-      </div>
+          }"
+        />
+
+      </el-form>
 
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitFormByRole">确 定</el-button>
@@ -97,26 +144,31 @@
 </template>
 
 <script>
-import { deleteByIds, pageByParams, updateAllById, save, grant } from '@/api/system/roles'
+import { deleteByIds, pageByParams, updateAllById, save, getGrantByRoleId, saveGrant } from '@/api/system/roles'
 import { getMenusTree } from '@/api/system/menus'
 
 export default {
   data() {
     return {
+      // 分配权限的显示与不显示 与展开和收起互动
       menuShow: true,
+      // 全部展开/收起
       isExpand: true,
       // 分配用户数据
-      transferData: [{ key: 1, label: '上海', disabled: false }, { key: 2, label: '北京', disabled: false }],
+      transferData: [],
       // 分配用户选择数据
       transferValue: [],
-      // 菜单树过滤条件
+      // 分配权限搜索条件
       filterText: '',
+      // 权限树渲染格式
       defaultProps: {
         id: 'id',
         children: 'children',
-        label: 'title',
+        label: 'title'
       },
+      // 当前角色拥有的菜单权限ID
       treeIds: [],
+      // 全局加载中开启/ 关闭
       tableLoading: false,
       // 表格样式设置
       tableConfig: {
@@ -143,27 +195,31 @@ export default {
       total: 0,
       // 表格数据
       tableData: [],
-      //菜单权限树
+      // 菜单权限树
       menusTree: [],
       // 搜索条件
       searchForm: {
+        name: null,
+        description: null
       },
-      // 复选框选择的主键
+      // 主数据复选框选择的主键
       selectedIds: [],
       // 新增修改表单
       form: {
         name: null, // 角色名称
         description: null, // 角色描述
-        menus: [], // 菜单权限ID
+        menus: [] // 菜单权限ID
+      },
+      //
+      formByRole: {
+        roleId: null,
+        userIds: []
       },
       // 表单前端校验是否输入
       rules: {
         name: [
           { required: true, message: '请输入角色名称', trigger: 'blur' }
-        ],
-        description: [
-          { required: true, message: '请输入角色描述', trigger: 'blur' }
-        ],
+        ]
       }
     }
   },
@@ -178,21 +234,26 @@ export default {
       }
     }
   },
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val)
+    }
+  },
   created() {
     this.getTableData({}, this.currentPage, this.pageSize)
     this.getTreeData()
   },
   methods: {
-    // 用户角色过滤
+    // 分配角色搜索框输入过滤
     transferFilter(query, item) {
-      return item.username.indexOf(query) > -1;
+      return item.username.indexOf(query) > -1
     },
-    // tree中复选框发生改变触发事件
+    // 菜单权限树复选框选中事件
     handleCheck(data, node) {
-      console.log("node", node);
+      console.log('node', node)
       const ids = node.checkedKeys
       for (let i = 0; i < node.halfCheckedKeys.length; i++) {
-        const id = node.halfCheckedKeys[i];
+        const id = node.halfCheckedKeys[i]
         ids.push(id)
       }
       this.form.menus = ids
@@ -201,16 +262,16 @@ export default {
     handleAssUser(row) {
       this.dialogVisibleByRole = true
       this.dialogByRoleTitle = '角色：' + row.name + ' 分配用户'
-      grant(row.id).then(res => {
-       const { data } = res
-       console.log("data",data);
-       
-       this.transferData = data.userList
-       this.transferValue = data.authUserIds
+      this.formByRole.roleId = row.id
+      getGrantByRoleId(row.id).then(res => {
+        const { data } = res
+        this.transferData = data.userList
+        this.transferValue = data.authUserIds
       })
     },
-    // 新增/修改弹窗打开后菜单树自动选中
+    // 新增/修改弹窗打开渲染DOM后事件
     dialogOpened(row) {
+      console.log('row', row)
       if (row.name !== null) {
         const ids = row.menus
         this.selectedMenus(ids)
@@ -221,52 +282,9 @@ export default {
     // 菜单树选中
     selectedMenus(ids) {
       // 选中菜单树
-      this.$refs.menuTree.setCheckedKeys(ids);
+      this.$refs.menuTree.setCheckedKeys(ids)
       // 全选和全不选不会触发 tree的 check 事件这里手动处理解决form表单中没有菜单数据的问题
       this.form.menus = ids
-    },
-    handleTree(data, id, parentId, children) {
-      let config = {
-        id: id || 'id',
-        parentId: parentId || 'parentId',
-        childrenList: children || 'children'
-      };
-
-      var childrenListMap = {};
-      var nodeIds = {};
-      var tree = [];
-
-      for (let d of data) {
-        let parentId = d[config.parentId];
-        if (childrenListMap[parentId] == null) {
-          childrenListMap[parentId] = [];
-        }
-        nodeIds[d[config.id]] = d;
-        childrenListMap[parentId].push(d);
-      }
-
-      for (let d of data) {
-        let parentId = d[config.parentId];
-        if (nodeIds[parentId] == null) {
-          tree.push(d);
-        }
-      }
-
-      for (let t of tree) {
-        adaptToChildrenList(t);
-      }
-
-      function adaptToChildrenList(o) {
-        if (childrenListMap[o[config.id]] !== null) {
-          o[config.childrenList] = childrenListMap[o[config.id]];
-        }
-        if (o[config.childrenList]) {
-          for (let c of o[config.childrenList]) {
-            adaptToChildrenList(c);
-          }
-        }
-      }
-      return tree;
     },
     // 全选/全不选
     handleCheckAll() {
@@ -288,24 +306,24 @@ export default {
     },
     // 菜单过滤数据
     filterMenusTree(value, data) {
-      if (!value) return true;
-      return data.title.indexOf(value) !== -1;
+      if (!value) return true
+      return data.title.indexOf(value) !== -1
     },
-    // 初始化Tree数据
+    // 初始化菜单权限树数据
     getTreeData() {
       this.tableLoading = true
-      getMenusTree().then(res => {
+      getMenusTree({}).then(res => {
         const { data } = res
-        // 主数据
+        // 权限的ids
         this.treeIds = data.map(item => item.id)
+        // 菜单权限树插入数据
         this.menusTree = this.handleTree(data)
         this.tableLoading = false
-      }).catch(error => {
-        this.$message.error(error)
+      }).catch(() => {
         this.tableLoading = false
       })
     },
-    // 表格初始化获取数据
+    // 表格主数据获取数据
     getTableData(data, currentPage, pageSize) {
       this.tableLoading = true
       pageByParams(data, currentPage, pageSize).then(res => {
@@ -316,10 +334,8 @@ export default {
         this.total = data.total
         this.tableData = data.data
         this.tableLoading = false
-      }).catch(error => {
-        this.$message.error(error)
+      }).catch(() => {
         this.tableLoading = false
-        // console.log(error)
       })
     },
     // 新增按钮被点击
@@ -351,9 +367,7 @@ export default {
             message: '删除成功!'
           })
           this.handlePagination()
-        }).catch(error => {
-          // this.$message.error(error)
-          // console.log(error)
+        }).catch(() => {
         })
       }).catch(() => {
         this.$message({
@@ -382,9 +396,8 @@ export default {
             message: '删除成功!'
           })
           this.handlePagination()
-        }).catch(error => {
-          // this.$message.error(error)
-          // console.log(error)
+        }).catch(() => {
+
         })
       })
     },
@@ -396,8 +409,6 @@ export default {
     handleSelectionChange(selection) {
       this.selectedUsers = selection
       this.selectedIds = selection.map(obj => obj.id)
-      // console.log(selection);
-      // console.log(this.selectedIds);
     },
     // 导入按钮被点击
     handleImport() {
@@ -478,82 +489,22 @@ export default {
     },
     // 分配用户表单提交
     submitFormByRole() {
+      console.log('transferValue', this.transferValue)
+      this.formByRole.userIds = this.transferValue
+      console.log('formByRole', this.formByRole)
+      saveGrant(this.formByRole).then(() => {
+        this.$message({
+          type: 'success',
+          message: '分配成功!'
+        })
+      }).catch(() => {
 
-    }
-  },
-  watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val);
+      })
     }
   }
 
 }
 </script>
-
 <style scoped>
-.user-management {
-  padding: 20px;
-}
 
-.search-bar {
-  margin-bottom: 20px;
-  padding: 20px 40px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, .2);
-  border-radius: 10px;
-  background-color: white;
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-
-}
-
-.grid-item {
-  width: 300px;
-  display: flex;
-  align-items: center;
-}
-
-.button-bar {
-  margin-bottom: 20px;
-  padding: 20px 20px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, .2);
-  border-radius: 10px;
-  background-color: white;
-
-  white-space: nowrap;
-}
-
-.el-table {
-  margin-bottom: 20px;
-  border-radius: 10px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, .2);
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-  .search-bar {
-    flex-direction: column;
-  }
-
-  .button-bar {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .el-table {
-    font-size: 14px;
-  }
-
-  .el-pagination {
-    font-size: 14px;
-  }
-}
 </style>

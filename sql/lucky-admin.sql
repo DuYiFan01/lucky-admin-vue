@@ -97,6 +97,7 @@ CREATE TABLE `menus` (
                          `remark` VARCHAR ( 500 ) NULL DEFAULT '' COMMENT '备注',
                          PRIMARY KEY ( `id` ) USING BTREE,
                          INDEX `index_parent_id` ( `parent_id` ASC ) USING BTREE
+                         UNIQUE INDEX `name_title`(`name` ASC, `title` ASC) USING BTREE
 ) ENGINE = INNODB CHARACTER
 SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单表';
 

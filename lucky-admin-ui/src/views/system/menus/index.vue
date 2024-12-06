@@ -1,24 +1,32 @@
 <template>
   <div class="user-management">
-    <div class="search-bar">
+    <div v-permission="['system::menus::list']" class="search-bar">
       <div class="grid-item">
         <span>
           菜单名称:
         </span>
-        <el-input v-model="searchForm.name" placeholder="请输入菜单名称" style="width: 200px; margin-right: 10px;" />
+        <el-input v-model="searchForm.title" placeholder="请输入菜单名称" style="width: 200px;" />
       </div>
       <div class="grid-item">
-        <el-button type="primary" @click="handleSearch">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
     </div>
-    <div class="button-bar">
-      <el-button type="primary" @click="handleAdd">新增菜单</el-button>
-      <el-button type="danger" @click="handleExpand">收起/展开</el-button>
-      <el-button type="info" @click="handleRefresh">刷新</el-button>
+    <div v-permission="['system::menus::insert','system::menus::list']" class="button-bar">
+      <el-button v-permission="['system::menus::insert']" :type="buttonBar.insertType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleAdd">新增菜单</el-button>
+      <el-button type="danger" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleExpand">收起/展开</el-button>
+      <el-button v-permission="['system::menus::list']" :type="buttonBar.reFreshType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleRefresh">刷新</el-button>
     </div>
-    <el-table v-if="tableShow" v-loading.fullscreen.lock="tableLoading" row-key="id" :default-expand-all="isExpand"
-      :data="treeData" style="width: 100%" border max-height="560"
-      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
+    <el-table
+      v-if="tableShow"
+      v-loading.fullscreen.lock="tableLoading"
+      row-key="id"
+      :default-expand-all="isExpand"
+      :data="treeData"
+      style="width: 100%"
+      border
+      max-height="560"
+      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+    >
       <el-table-column prop="title" label="菜单名称" v-bind="columnProps" />
       <el-table-column prop="icon" label="菜单图标" v-bind="columnProps">
         <template slot-scope="scope">
@@ -37,22 +45,40 @@
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" v-bind="columnProps" />
-      <el-table-column label="操作" width="200" fixed="right" :header-align="tableConfig.headerAlign" align="center">
+      <el-table-column
+        v-if="checkPermission(['system::menus::update','system::menus::delete'])"
+        label="操作"
+        width="150"
+        fixed="right"
+        :header-align="tableConfig.headerAlign"
+        align="center"
+      >
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+          <el-button v-permission="['system::menus::update']" :size="toolBar.size" :type="toolBar.updateType" :icon="toolBar.updateIcon" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button v-permission="['system::menus::delete']" :size="toolBar.size" :type="toolBar.deleteType" :icon="toolBar.deleteIcon" @click="handleDelete(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 添加或修改菜单对话框 -->
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="680px" :close-on-click-modal="false" center
-      append-to-body>
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      width="680px"
+      :close-on-click-modal="false"
+      center
+      append-to-body
+    >
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="24">
             <el-form-item label="上级菜单" prop="parentId">
-              <treeselect v-model="form.parentId" :options="menuOptions" :normalizer="normalizer" :show-count="true"
-                placeholder="选择上级菜单" />
+              <treeselect
+                v-model="form.parentId"
+                :options="menuOptions"
+                :normalizer="normalizer"
+                :show-count="true"
+                placeholder="选择上级菜单"
+              />
             </el-form-item>
           </el-col>
 
@@ -82,7 +108,7 @@
               <el-input v-model="form.title" placeholder="请输入菜单中文名称" />
             </el-form-item>
           </el-col>
-          <el-col :span="12" v-if="form.menuType != 'F'">
+          <el-col v-if="form.menuType != 'F'" :span="12">
             <el-form-item prop="name">
               <span slot="label">
                 <el-tooltip content="菜单别名,菜单英文名称，如路由为/system/users的菜单别名一般为users,保证唯一标识即可，填写英文" placement="top">
@@ -98,7 +124,7 @@
               <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
             </el-form-item>
           </el-col>
-          <el-col v-if="form.menuType != 'F' && form.menuType !='C'" :span="12">
+          <el-col v-if="form.menuType != 'F' && form.menuType != 'C'" :span="12">
             <el-form-item prop="isFrame">
               <span slot="label">
                 <el-tooltip content="选择是外链则路由地址需要以`http(s)://`开头" placement="top">
@@ -108,7 +134,7 @@
               </span>
               <el-radio-group v-model="form.isFrame">
                 <el-radio v-for="v in isFrameTyps" :key="v.value" :label="v.value">{{ v.label
-                  }}</el-radio>
+                }}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -134,7 +160,7 @@
               <el-input v-model="form.component" placeholder="请输入组件路径" />
             </el-form-item>
           </el-col>
-          <el-col v-if="form.menuType != 'M'" :span="12">
+          <el-col v-if="form.menuType == 'F'" :span="12">
             <el-form-item prop="perms">
               <el-input v-model="form.roles" placeholder="请输入权限标识" maxlength="100" />
               <span slot="label">
@@ -146,16 +172,18 @@
             </el-form-item>
           </el-col>
           <el-col v-if="form.menuType == 'C'" :span="12">
-            <!-- <el-form-item prop="query">
+            <el-form-item prop="query">
               <el-input v-model="form.query" placeholder="请输入路由参数" maxlength="255" />
               <span slot="label">
-                <el-tooltip content="访问路由的默认传递参数，如：`{&quot;id&quot;: 1, &quot;name&quot;: &quot;ry&quot;}`"
-                  placement="top">
+                <el-tooltip
+                  content="访问路由的默认传递参数，如：`{&quot;id&quot;: 1, &quot;name&quot;: &quot;ry&quot;}`"
+                  placement="top"
+                >
                   <i class="el-icon-question" />
                 </el-tooltip>
                 路由参数
               </span>
-            </el-form-item> -->
+            </el-form-item>
           </el-col>
           <el-col v-if="form.menuType == 'C'" :span="12">
             <el-form-item prop="isCache">
@@ -167,7 +195,7 @@
               </span>
               <el-radio-group v-model="form.isCache">
                 <el-radio v-for="v in isCacheTyps" :key="v.value" :label="v.value">{{ v.label
-                  }}</el-radio>
+                }}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -181,7 +209,7 @@
               </span>
               <el-radio-group v-model="form.visible">
                 <el-radio v-for="v in visibleTyps" :key="v.value" :label="v.value">{{ v.label
-                  }}</el-radio>
+                }}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -197,7 +225,7 @@
 </template>
 
 <script>
-import { deleteByIds, updateSpecifyById, save, getMenusTree, getMenuMouldTree } from '@/api/system/menus'
+import { deleteByIds, save, getMenusTree, updateAllById } from '@/api/system/menus'
 import IconSelect from '@/components/IconSelect/index'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -206,6 +234,7 @@ export default {
   components: { Treeselect, IconSelect },
   data() {
     return {
+      // 表格显示与不显示 与展开和收起互动
       tableShow: true,
       // 全部展开/收起
       isExpand: false,
@@ -233,7 +262,7 @@ export default {
         { value: 1, label: '是' },
         { value: 0, label: '否' }
       ],
-      // 上级菜单树数据
+      // dialog表单中可选择上级菜单项目
       menuOptions: [],
       // 新增/修改弹窗开关
       dialogVisible: false,
@@ -241,14 +270,12 @@ export default {
       dialogTitle: '',
       // 新增按钮被点击时为 insert 修改按钮被点击时值为 update
       dialogType: '',
-      // 表格树数据
+      // 菜单树主数据
       treeData: [],
       // 搜索条件
       searchForm: {
-        name: null, // 菜单名称
+        title: null // 菜单名称
       },
-      // 复选框选择的主键
-      selectedIds: [],
       // 新增修改表单
       form: {
         name: null, // 菜单别名
@@ -302,7 +329,7 @@ export default {
     }
   },
   computed: {
-    // 计算属性
+    // 计算属性 表格样式
     columnProps() {
       return {
         showOverflowTooltip: this.tableConfig.tooltip,
@@ -312,78 +339,33 @@ export default {
       }
     }
   },
+  // 挂在完DOM之后的生命周期
   created() {
     this.handlePagination()
-
-    // this.getTableData({}, this.currentPage, this.pageSize)
   },
+  // 函数
   methods: {
-    handleTree(data, id, parentId, children) {
-      let config = {
-        id: id || 'id',
-        parentId: parentId || 'parentId',
-        childrenList: children || 'children'
-      };
-
-      var childrenListMap = {};
-      var nodeIds = {};
-      var tree = [];
-
-      for (let d of data) {
-        let parentId = d[config.parentId];
-        if (childrenListMap[parentId] == null) {
-          childrenListMap[parentId] = [];
-        }
-        nodeIds[d[config.id]] = d;
-        childrenListMap[parentId].push(d);
-      }
-
-      for (let d of data) {
-        let parentId = d[config.parentId];
-        if (nodeIds[parentId] == null) {
-          tree.push(d);
-        }
-      }
-
-      for (let t of tree) {
-        adaptToChildrenList(t);
-      }
-
-      function adaptToChildrenList(o) {
-        if (childrenListMap[o[config.id]] !== null) {
-          o[config.childrenList] = childrenListMap[o[config.id]];
-        }
-        if (o[config.childrenList]) {
-          for (let c of o[config.childrenList]) {
-            adaptToChildrenList(c);
-          }
-        }
-      }
-      return tree;
-    },
-    // 初始化Tree数据
+    // 初始化菜单树主数据
     getTreeData() {
       this.tableLoading = true
-      getMenusTree().then(res => {
+      getMenusTree(this.searchForm).then(res => {
         const { data } = res
-        // 主数据
+        // 初始化菜单主数据
         this.treeData = this.handleTree(data)
         this.tableLoading = false
-      }).catch(error => {
-        this.$message.error(error)
+      }).catch(() => {
         this.tableLoading = false
       })
     },
     // 新增时获取上级菜单
     getMouldsTree() {
-      getMenusTree().then(res => {
+      getMenusTree({}).then(res => {
         const { data } = res
-        this.menuOptions = [];
-        const menu = { id: 0, title: '主类目', children: [] };
-        menu.children = this.handleTree(data);
-        this.menuOptions.push(menu);
-      }).catch(error => {
-        this.$message.error(error)
+        this.menuOptions = []
+        const menu = { id: 0, title: '主类目', children: [] }
+        menu.children = this.handleTree(data)
+        this.menuOptions.push(menu)
+      }).catch(() => {
         this.tableLoading = false
       })
     },
@@ -408,16 +390,13 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // console.log(id)
         deleteByIds(id).then(() => {
           this.$message({
             type: 'success',
             message: '删除成功!'
           })
           this.handlePagination()
-        }).catch(error => {
-          this.$message.error(error)
-          // console.log(error)
+        }).catch(() => {
         })
       }).catch(() => {
         this.$message({
@@ -426,7 +405,7 @@ export default {
         })
       })
     },
-    // 目录树结构转换
+    // dialog表单上级目录结构格式化
     normalizer(node) {
       if (node.children && !node.children.length) {
         delete node.childrens
@@ -437,11 +416,11 @@ export default {
         children: node.children
       }
     },
-    // 选择图标
+    // 表单中选择图标
     selectedIcon(name) {
       this.form.icon = name
     },
-    // 收缩展开被点击
+    // 菜单主数据收缩展开按钮被点击
     handleExpand() {
       this.isExpand = !this.isExpand
       this.tableShow = false
@@ -458,9 +437,11 @@ export default {
     handleRefresh() {
       this.handlePagination()
     },
-    // 获取数据
+    // 获取菜单主数据和表单中上级目录数据
     handlePagination() {
+      // 初始化菜单树主数据
       this.getTreeData()
+      // 初始化新增表单中上级目录数据
       this.getMouldsTree()
     },
     // 重置表单
@@ -496,21 +477,18 @@ export default {
                 message: '新增成功!'
               })
               this.handlePagination()
-            }).catch(error => {
-              this.$message.error(error)
-              // console.log(error)
+            }).catch(() => {
             })
           } else if (this.dialogType === 'update') {
             // 修改
-            updateSpecifyById(this.form).then(() => {
+            updateAllById(this.form).then(() => {
               this.$message({
                 type: 'success',
                 message: '修改成功!'
               })
               this.handlePagination()
-            }).catch(error => {
-              this.$message.error(error)
-              // console.log(error)
+            }).catch(() => {
+
             })
           } else {
             this.$message.$error('请选择要操作的数据')
@@ -527,69 +505,5 @@ export default {
 </script>
 
 <style scoped>
-.user-management {
-  padding: 20px;
-}
 
-.search-bar {
-  margin-bottom: 20px;
-  padding: 20px 40px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, .2);
-  border-radius: 10px;
-  background-color: white;
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-
-}
-
-.grid-item {
-  width: 300px;
-  display: flex;
-  align-items: center;
-}
-
-.button-bar {
-  margin-bottom: 20px;
-  padding: 20px 20px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, .2);
-  border-radius: 10px;
-  background-color: white;
-
-  white-space: nowrap;
-}
-
-.el-table {
-  margin-bottom: 20px;
-  border-radius: 10px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, .2);
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-  .search-bar {
-    flex-direction: column;
-  }
-
-  .button-bar {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .el-table {
-    font-size: 14px;
-  }
-
-  .el-pagination {
-    font-size: 14px;
-  }
-}
 </style>

@@ -1,24 +1,6 @@
 import request from '@/utils/request'
 const apiPath = '/system/menus' // api Path url
 
-// 查询所有
-export function list(data) {
-  return request({
-    url: apiPath + '/list',
-    method: 'post',
-    data
-  })
-}
-
-// 条件分页查询
-export function pageByParams(data, currentPage, pageSize) {
-  return request({
-    url: apiPath + '/pageByParams?&currentPage=' + currentPage + '&pageSize=' + pageSize,
-    method: 'post',
-    data
-  })
-}
-
 // id查询一个
 export function getById(id) {
   return request({
@@ -63,18 +45,10 @@ export function deleteByIds(ids) {
 }
 
 // 获取菜单树
-export function getMenusTree() {
+export function getMenusTree(data) {
   return request({
     url: apiPath + '/getMenusTree',
-    method: 'get'
+    method: 'post',
+    data
   })
 }
-
-// 获取菜单树
-export function getMenuMouldTree() {
-  return request({
-    url: apiPath + '/getMenuMouldTree',
-    method: 'get'
-  })
-}
-

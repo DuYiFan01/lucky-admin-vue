@@ -9,6 +9,7 @@ import cn.anlucky.system.page.vo.PageDataVo;
 import cn.anlucky.system.pojo.LoginLog;
 import cn.anlucky.system.service.LoginLogService;
 import cn.anlucky.vo.R;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -26,26 +27,18 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/system/login-log")
+@RequestMapping("/system/loginLog")
 public class LoginLogController extends BaseController {
 
     private final LoginLogService loginLogService;
 
-    /**
-     * 查询所有
-     * @return
-     */
-    @PostMapping("/list")
-    public R list() {
-        List<LoginLog> list = loginLogService.list();
-        return R.ok(list);
-    }
 
     /**
     * 条件分页查询
     * @param loginLog
     * @return
     */
+    @SaCheckPermission("system::logs::loginLog::list")
     @PostMapping("/pageByParams")
     public R listByPage(@RequestBody LoginLog loginLog) {
         startPage();
@@ -59,6 +52,7 @@ public class LoginLogController extends BaseController {
     * @param ids
     * @return
     */
+    @SaCheckPermission("system::logs::loginLog::list")
     @Log(title = "用户登录日志", businessType = BusinessType.DELETE)
     @GetMapping("/delete/{ids}")
     public R deleteByIds(@PathVariable(name = "ids") Serializable[] ids) {

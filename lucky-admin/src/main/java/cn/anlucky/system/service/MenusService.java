@@ -1,6 +1,7 @@
 package cn.anlucky.system.service;
 
 import cn.anlucky.system.pojo.Menus;
+import cn.anlucky.system.vo.RouterVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -15,11 +16,10 @@ import java.util.List;
 public interface MenusService extends IService<Menus> {
 
     /**
-     * 分页带条件查询Menus
-     * @param menus
-     * @return
+     * 获取路由树
      */
-    public List<Menus> pageByParams(Menus menus);
+    public List<RouterVo> getRouterTree();
+
 
     /**
      * 修改所有字段为新值
@@ -34,5 +34,18 @@ public interface MenusService extends IService<Menus> {
      * @return
      */
     public boolean updateSpecifyById(Menus menus);
+
+    /**
+     * 新增Menus
+     * @param menus
+     * @return
+     */
+    public boolean saveMenus(Menus menus);
+
+    /**
+     * 获取菜单树
+     */
+    public List<Menus> getMenusTree(Menus menus);
+
 
 }

@@ -1,19 +1,52 @@
 package cn.anlucky.system.listener;
 
+import cn.anlucky.system.pojo.LoginLog;
+import cn.anlucky.system.service.LoginLogService;
+import cn.anlucky.system.utils.AddressUtils;
+import cn.anlucky.system.utils.IpUtils;
+import cn.anlucky.system.utils.ServletUtils;
+import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
+import eu.bitwalker.useragentutils.UserAgent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 /**
  * 自定义侦听器的实现
  */
 @Component
-public class SaTokenListener implements cn.dev33.satoken.listener.SaTokenListener {
+public class SaTokenListenerConfig implements SaTokenListener {
+
+    @Autowired
+    private LoginLogService loginLogService;
 
     /**
      * 每次登录时触发
      */
     @Override
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginModel loginModel) {
+
+        String username = "admin";
+        String ip = IpUtils.getIpAddr();
+        String ipAddr = AddressUtils.getRealAddressByIP(ip);
+        UserAgent userAgent = UserAgent.parseUserAgentString(ServletUtils.getRequest().getHeader("User-Agent"));
+        // 获取操作系统
+        String os = userAgent.getOperatingSystem().getName();
+        // 获取客户端浏览器
+        String browser = userAgent.getBrowser().getName();
+        LoginLog loginLog = new LoginLog();
+        loginLog.setUsername(username);
+        loginLog.setIp(ip);
+        loginLog.setIpAddr(ipAddr);
+        loginLog.setBrowser(browser);
+        loginLog.setOs(os);
+        loginLog.setStatus("0");
+        loginLog.setMsg("登录成功");
+        loginLog.setCreateTime(LocalDateTime.now());
+        System.out.println("tokenValue = " + tokenValue);
+        // loginLogService.save(loginLog);
         System.out.println("---------- 自定义侦听器实现 doLogin");
     }
 
