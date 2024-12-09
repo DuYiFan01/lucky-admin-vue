@@ -1,129 +1,111 @@
-
-
-
-
+SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- 创建用户表
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
-                         `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-                         `username` VARCHAR ( 50 ) NOT NULL COMMENT '用户名',
-                         `password` VARCHAR ( 255 ) NOT NULL COMMENT '密码',
-                         `email` VARCHAR ( 100 ) NULL DEFAULT NULL COMMENT '邮箱',
-                         `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                         `create_by` VARCHAR ( 50 ) NULL DEFAULT NULL COMMENT '创建人',
-                         `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-                         `update_by` VARCHAR ( 50 ) NULL DEFAULT NULL COMMENT '更新人',
-                         `del_flag` INT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
-                         PRIMARY KEY ( `id` ) USING BTREE,
-                         UNIQUE INDEX `username` ( `username` ASC ) USING BTREE
-) ENGINE = INNODB CHARACTER
-SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表';
+-- ----------------------------
+-- Table structure for login_log
+-- ----------------------------
+DROP TABLE IF EXISTS `login_log`;
+CREATE TABLE `login_log`  (
+                              `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+                              `username` varchar(50) NULL DEFAULT '' COMMENT '登录账号',
+                              `ip` varchar(128)  NULL DEFAULT '' COMMENT '登录IP地址',
+                              `ip_addr` varchar(255) NULL DEFAULT '' COMMENT '登录地点',
+                              `browser` varchar(50) NULL DEFAULT '' COMMENT '浏览器类型',
+                              `os` varchar(50) NULL DEFAULT '' COMMENT '操作系统',
+                              `STATUS` char(1) NULL DEFAULT '0' COMMENT '登录状态（0成功 1失败）',
+                              `msg` varchar(255) NULL DEFAULT '' COMMENT '提示消息',
+                              `create_time` datetime NULL DEFAULT NULL COMMENT '访问时间',
+                              PRIMARY KEY (`id`) USING BTREE,
+                              INDEX `idx_login_log_s`(`STATUS` ASC) USING BTREE,
+                              INDEX `idx_login_log_lt`(`create_time` ASC) USING BTREE,
+                              INDEX `idx_login_log_username`(`username` ASC) USING BTREE
+) COMMENT = '用户登录日志' ROW_FORMAT = Dynamic;
 
--- 添加用户信息
-INSERT INTO `users` ( `username`, `password`, `email`, `create_by`, `update_by` )
-VALUES
-    ( 'admin', 'admin123', 'admin@example.com', 'system', 'system' ),
-    ( 'user', 'admin123', 'user@example.com', 'system', 'system' ),
-    ( 'user1', 'admin123', 'user1@example.com', 'system', 'system' );
+-- ----------------------------
+-- Records of login_log
+-- ----------------------------
 
-
--- 创建角色表
-DROP TABLE IF EXISTS `roles`;
-CREATE TABLE `roles` (
-                         `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '角色ID',
-                         `name` VARCHAR ( 50 )  NOT NULL COMMENT '角色名称',
-                         `description` VARCHAR ( 255 )  NULL COMMENT '角色描述',
-                         `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                         `create_by` VARCHAR ( 50 ) NULL DEFAULT NULL COMMENT '创建人',
-                         `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-                         `update_by` VARCHAR ( 50 )  NULL DEFAULT NULL COMMENT '更新人',
-                         PRIMARY KEY ( `id` ) USING BTREE,
-                         UNIQUE INDEX `name` ( `name` ASC ) USING BTREE
-) ENGINE = INNODB CHARACTER
-SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色表';
-
--- 添加角色信息
-INSERT INTO `roles` ( `name`, `description`, `create_by`, `update_by` )
-VALUES
-    ( 'admin', '系统管理员', 'system', 'system' ),
-    ( 'user', '普通用户', 'system', 'system' ),
-    ( 'testUser', '测试用户', 'system', 'system' );
-
-
-
-
--- 创建用户角色关联表
-DROP TABLE IF	EXISTS `user_roles`;
-CREATE TABLE `user_roles` (
-                              `user_id` BIGINT NOT NULL COMMENT '用户ID',
-                              `role_id` BIGINT NOT NULL COMMENT '角色ID',
-                              PRIMARY KEY ( `user_id`, `role_id` ) USING BTREE,
-                              INDEX `role_id` ( `role_id` ASC ) USING BTREE,
-                              CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY ( `user_id` ) REFERENCES `users` ( `id` ) ON DELETE RESTRICT ON UPDATE RESTRICT,
-                              CONSTRAINT `user_roles_ibfk_2` FOREIGN KEY ( `role_id` ) REFERENCES `roles` ( `id` ) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = INNODB CHARACTER
-SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户角色关联表';
-
--- 添加用户角色关联信息
-INSERT INTO `user_roles` ( `user_id`, `role_id` )
-VALUES
-    ( 1, 1 ),
-    ( 2, 2 ),
-    ( 3, 3 );
-
--- 创建菜单表
+-- ----------------------------
+-- Table structure for menus
+-- ----------------------------
 DROP TABLE IF EXISTS `menus`;
-CREATE TABLE `menus` (
-                         `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
-                         `name` VARCHAR ( 50 ) NULL DEFAULT NULL COMMENT '路由名称',
-                         `title` VARCHAR ( 50 ) NOT NULL DEFAULT '' COMMENT '菜单名称',
-                         `parent_id` BIGINT NULL DEFAULT 0 COMMENT '父菜单ID',
-                         `order_num` INT NULL DEFAULT 0 COMMENT '显示顺序',
-                         `path` VARCHAR ( 200 ) NULL DEFAULT '' COMMENT '路由地址',
-                         `component` VARCHAR ( 255 ) NULL DEFAULT NULL COMMENT '组件路径',
-                         `query` VARCHAR ( 255 ) NULL DEFAULT NULL COMMENT '路由参数',
-                         `is_frame` INT NULL DEFAULT 0 COMMENT '是否为外链（1是 0否）',
-                         `is_cache` INT NULL DEFAULT 1 COMMENT '是否缓存（1缓存 0不缓存）',
-                         `menu_type` CHAR ( 1 )  NULL DEFAULT '' COMMENT '菜单类型（M目录 C菜单 F按钮）',
-                         `visible` INT NULL DEFAULT 1 COMMENT '菜单状态（1显示 0隐藏）',
-                         `roles` VARCHAR ( 100 ) NULL DEFAULT NULL COMMENT '权限标识',
-                         `icon` VARCHAR ( 100 ) NULL DEFAULT '#' COMMENT '菜单图标',
-                         `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                         `create_by` VARCHAR ( 64 ) NULL DEFAULT '' COMMENT '创建人',
-                         `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-                         `update_by` VARCHAR ( 64 ) NULL DEFAULT '' COMMENT '更新人',
-                         `remark` VARCHAR ( 500 ) NULL DEFAULT '' COMMENT '备注',
-                         PRIMARY KEY ( `id` ) USING BTREE,
-                         INDEX `index_parent_id` ( `parent_id` ASC ) USING BTREE
-                         UNIQUE INDEX `name_title`(`name` ASC, `title` ASC) USING BTREE
-) ENGINE = INNODB CHARACTER
-SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单表';
+CREATE TABLE `menus`  (
+                          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
+                          `name` varchar(50)  NULL DEFAULT NULL COMMENT '路由名称',
+                          `title` varchar(50)  NOT NULL DEFAULT '' COMMENT '菜单名称',
+                          `parent_id` bigint NULL DEFAULT 0 COMMENT '父菜单ID',
+                          `order_num` int NULL DEFAULT 0 COMMENT '显示顺序',
+                          `path` varchar(200)  NULL DEFAULT '' COMMENT '路由地址',
+                          `component` varchar(255)  NULL DEFAULT NULL COMMENT '组件路径',
+                          `query` varchar(255) NULL DEFAULT NULL COMMENT '路由参数',
+                          `is_frame` int NULL DEFAULT 0 COMMENT '是否为外链（1是 0否）',
+                          `is_cache` int NULL DEFAULT 1 COMMENT '是否缓存（1缓存 0不缓存）',
+                          `menu_type` char(1)  NULL DEFAULT '' COMMENT '菜单类型（M目录 C菜单 F按钮）',
+                          `visible` int NULL DEFAULT 1 COMMENT '菜单状态（1显示 0隐藏）',
+                          `roles` varchar(100) NULL DEFAULT NULL COMMENT '权限标识',
+                          `icon` varchar(100) NULL DEFAULT '#' COMMENT '菜单图标',
+                          `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                          `create_by` varchar(64)  NULL DEFAULT '' COMMENT '创建人',
+                          `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+                          `update_by` varchar(64)  NULL DEFAULT '' COMMENT '更新人',
+                          `remark` varchar(500) NULL DEFAULT '' COMMENT '备注',
+                          PRIMARY KEY (`id`) USING BTREE,
+                          UNIQUE INDEX `name_title`(`name` ASC, `title` ASC) USING BTREE,
+                          INDEX `index_parent_id`(`parent_id` ASC) USING BTREE
+)COMMENT = '菜单表' ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Records of menus
+-- ----------------------------
+INSERT INTO `menus` VALUES (NULL, 'system', '系统管理', 0, 1, '/system', NULL, NULL, 0, 1, 'M', 1, NULL, 'system', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'users', '用户管理', 1, 1, '/system/users', '/system/users/index', NULL, 0, 1, 'C', 1, '', 'user', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'menus', '菜单管理', 1, 2, '/system/menus', '/system/menus/index', NULL, 0, 1, 'C', 1, '', 'tree-table', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'roles', '角色管理', 1, 3, '/system/roles', '/system/roles/index', NULL, 0, 1, 'C', 1, '', 'peoples', CURRENT_TIMESTAMP, 'system',CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'logs', '日志管理', 1, 4, '/system/logs', NULL, NULL, 0, 1, 'M', 1, NULL, 'log', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'operlog', '操作日志', 5, 1, '/system/logs/operlog', '/system/logs/operlog/index', NULL, 0, 1, 'C', 1, '', 'form', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'loginlog', '登录日志', 5, 2, '/system/logs/loginlog', '/system/logs/loginlog/index', NULL, 0, 1, 'C', 1, '', 'logininfor', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, '', '用户新增', 2, 2, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::insert', '#',CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'tool', '系统工具', 0, 2, '/tool', NULL, NULL, 0, 1, 'M', 1, NULL, 'tool', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'swagger', '系统接口', 9, 1, '/tool/swagger', '/tool/swagger/index', NULL, 0, 1, 'C', 1, '', 'swagger', CURRENT_TIMESTAMP, 'system',CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'MyGitee', 'Gitee地址', 0, 4, 'https://gitee.com/xiaodu6/lucky-admin-vue', NULL, NULL, 1, 1, 'M', 1, NULL, 'guide', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '菜单查询', 3, 1, '', NULL, NULL, 0, 1, 'F', 1, 'system::menus::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '用户查询', 2, 1, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '菜单新增', 3, 2, '', NULL, NULL, 0, 1, 'F', 1, 'system::menus::insert', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '菜单修改', 3, 3, '', NULL, NULL, 0, 1, 'F', 1, 'system::menus::update', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '菜单删除', 3, 4, '', NULL, NULL, 0, 1, 'F', 1, 'system::menus::delete', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '用户修改', 2, 3, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::update', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '用户删除', 2, 4, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::delete', '#',CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '用户导入', 2, 5, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::import', '#',CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '用户导出', 2, 6, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::export', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '用户添加角色', 2, 7, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::grant', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '角色查询', 4, 1, '', NULL, NULL, 0, 1, 'F', 1, 'system::role::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '角色新增', 4, 2, '', NULL, NULL, 0, 1, 'F', 1, 'system::role::insert', '#',CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '角色修改', 4, 3, '', NULL, NULL, 0, 1, 'F', 1, 'system::role::update', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '角色删除', 4, 4, '', NULL, NULL, 0, 1, 'F', 1, 'system::role::delete', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '角色添加用户', 4, 5, '', NULL, NULL, 0, 1, 'F', 1, 'system::role::grant', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '操作查询', 6, 1, '', NULL, NULL, 0, 1, 'F', 1, 'system::logs::oprLogs::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '登录查询', 7, 1, '', NULL, NULL, 0, 1, 'F', 1, 'system::logs::loginLog::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '操作删除', 6, 2, '', NULL, NULL, 0, 1, 'F', 1, 'system::logs::oprLogs::delete', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '登录删除', 7, 2, '', NULL, NULL, 0, 1, 'F', 1, 'system::logs::loginLog::delete', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'monitor', '系统监控', 0, 3, '/monitor', NULL, NULL, 0, 1, 'M', 1, NULL, 'monitor',CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'server', '服务监控', 31, 1, '/monitor/server', '/monitor/server/index', NULL, 0, 1, 'C', 1, NULL, 'server', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, NULL, '服务查询', 32, 1, '', NULL, NULL, 0, 1, 'F', 1, 'monitor::server::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
 
--- 创建角色菜单表
-DROP TABLE IF EXISTS `roles_menus`;
-CREATE TABLE `roles_menus` (
-                               `role_id` BIGINT NOT NULL COMMENT '角色ID',
-                               `menu_id` BIGINT NOT NULL COMMENT '菜单ID',
-                               PRIMARY KEY ( `role_id`, `menu_id` ) USING BTREE
-)	ENGINE = INNODB CHARACTER
-SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色和菜单关联表';
-
--- 创建操作日志表
+-- ----------------------------
+-- Table structure for opr_logs
+-- ----------------------------
 DROP TABLE IF EXISTS `opr_logs`;
 CREATE TABLE `opr_logs`  (
                              `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志主键',
-                             `title` varchar(50)  NULL DEFAULT '' COMMENT '模块标题',
+                             `title` varchar(50) NULL DEFAULT '' COMMENT '模块标题',
                              `business_type` int NULL DEFAULT 0 COMMENT '业务类型（0其它 1新增 2修改 3删除）',
-                             `method_name` varchar(200)  NULL DEFAULT '' COMMENT '方法名称',
-                             `request_method` varchar(10)  NULL DEFAULT '' COMMENT '请求方式',
-                             `username` varchar(50)  NULL DEFAULT '' COMMENT '操作人员',
-                             `url` varchar(255)  NULL DEFAULT '' COMMENT '请求URL',
-                             `ip` varchar(128)  NULL DEFAULT '' COMMENT '主机地址',
-                             `param` varchar(2000)  NULL DEFAULT '' COMMENT '请求参数',
-                             `result` varchar(2000)  NULL DEFAULT '' COMMENT '返回参数',
+                             `method_name` varchar(200) NULL DEFAULT '' COMMENT '方法名称',
+                             `request_method` varchar(10) NULL DEFAULT '' COMMENT '请求方式',
+                             `username` varchar(50) NULL DEFAULT '' COMMENT '操作人员',
+                             `url` varchar(255) NULL DEFAULT '' COMMENT '请求URL',
+                             `ip` varchar(128) NULL DEFAULT '' COMMENT '主机地址',
+                             `param` varchar(2000) NULL DEFAULT '' COMMENT '请求参数',
+                             `result` varchar(2000) NULL DEFAULT '' COMMENT '返回参数',
                              `status` int NULL DEFAULT 0 COMMENT '操作状态（0正常 1异常）',
                              `error_msg` varchar(2000) NULL DEFAULT '' COMMENT '错误消息',
                              `start_time` datetime NULL DEFAULT NULL COMMENT '操作时间',
@@ -132,24 +114,127 @@ CREATE TABLE `opr_logs`  (
                              INDEX `idx_sys_oper_log_bt`(`business_type` ASC) USING BTREE,
                              INDEX `idx_sys_oper_log_s`(`status` ASC) USING BTREE,
                              INDEX `idx_sys_oper_log_ot`(`start_time` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志记录';
+) COMMENT = '操作日志记录' ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Records of opr_logs
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for roles
+-- ----------------------------
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE `roles`  (
+                          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '角色ID',
+                          `name` varchar(50) NOT NULL COMMENT '角色名称',
+                          `description` varchar(255)  NULL DEFAULT NULL COMMENT '角色描述',
+                          `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                          `create_by` varchar(50)  NULL DEFAULT NULL COMMENT '创建人',
+                          `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+                          `update_by` varchar(50) NULL DEFAULT NULL COMMENT '更新人',
+                          PRIMARY KEY (`id`) USING BTREE,
+                          UNIQUE INDEX `name`(`name` ASC) USING BTREE
+) COMMENT = '角色表' ROW_FORMAT = Dynamic;
 
-DROP TABLE IF	EXISTS login_log;
-CREATE TABLE login_log (
-                           id BIGINT NOT NULL AUTO_INCREMENT COMMENT 'id',
-                           username VARCHAR ( 50 ) DEFAULT '' COMMENT '登录账号',
-                           ip VARCHAR ( 128 ) DEFAULT '' COMMENT '登录IP地址',
-                           ip_addr VARCHAR ( 255 ) DEFAULT '' COMMENT '登录地点',
-                           browser VARCHAR ( 50 ) DEFAULT '' COMMENT '浏览器类型',
-                           os VARCHAR ( 50 ) DEFAULT '' COMMENT '操作系统',
-                           STATUS CHAR ( 1 ) DEFAULT '0' COMMENT '登录状态（0成功 1失败）',
-                           msg VARCHAR ( 255 ) DEFAULT '' COMMENT '提示消息',
-                           create_time datetime COMMENT '访问时间',
-                           PRIMARY KEY ( id ),
-                           KEY idx_login_log_s ( STATUS ),
-                           KEY idx_login_log_lt ( create_time )
-) ENGINE = INNODB COMMENT = '用户登录日志';
+-- ----------------------------
+-- Records of roles
+-- ----------------------------
+INSERT INTO `roles` VALUES (1, 'admin', '系统管理员', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system');
+INSERT INTO `roles` VALUES (2, 'user', '普通用户', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system');
+
+-- ----------------------------
+-- Table structure for roles_menus
+-- ----------------------------
+DROP TABLE IF EXISTS `roles_menus`;
+CREATE TABLE `roles_menus`  (
+                                `role_id` bigint NOT NULL COMMENT '角色ID',
+                                `menu_id` bigint NOT NULL COMMENT '菜单ID',
+                                PRIMARY KEY (`role_id`, `menu_id`) USING BTREE
+) COMMENT = '角色和菜单关联表';
+
+-- ----------------------------
+-- Records of roles_menus
+-- ----------------------------
+INSERT INTO `roles_menus` VALUES (1, 1);
+INSERT INTO `roles_menus` VALUES (1, 2);
+INSERT INTO `roles_menus` VALUES (1, 3);
+INSERT INTO `roles_menus` VALUES (1, 4);
+INSERT INTO `roles_menus` VALUES (1, 5);
+INSERT INTO `roles_menus` VALUES (1, 6);
+INSERT INTO `roles_menus` VALUES (1, 7);
+INSERT INTO `roles_menus` VALUES (1, 8);
+INSERT INTO `roles_menus` VALUES (1, 9);
+INSERT INTO `roles_menus` VALUES (1, 10);
+INSERT INTO `roles_menus` VALUES (1, 11);
+INSERT INTO `roles_menus` VALUES (1, 12);
+INSERT INTO `roles_menus` VALUES (1, 13);
+INSERT INTO `roles_menus` VALUES (1, 14);
+INSERT INTO `roles_menus` VALUES (1, 15);
+INSERT INTO `roles_menus` VALUES (1, 16);
+INSERT INTO `roles_menus` VALUES (1, 17);
+INSERT INTO `roles_menus` VALUES (1, 18);
+INSERT INTO `roles_menus` VALUES (1, 19);
+INSERT INTO `roles_menus` VALUES (1, 20);
+INSERT INTO `roles_menus` VALUES (1, 21);
+INSERT INTO `roles_menus` VALUES (1, 22);
+INSERT INTO `roles_menus` VALUES (1, 23);
+INSERT INTO `roles_menus` VALUES (1, 24);
+INSERT INTO `roles_menus` VALUES (1, 25);
+INSERT INTO `roles_menus` VALUES (1, 26);
+INSERT INTO `roles_menus` VALUES (1, 27);
+INSERT INTO `roles_menus` VALUES (1, 28);
+INSERT INTO `roles_menus` VALUES (1, 29);
+INSERT INTO `roles_menus` VALUES (1, 30);
+INSERT INTO `roles_menus` VALUES (1, 31);
+INSERT INTO `roles_menus` VALUES (1, 32);
+INSERT INTO `roles_menus` VALUES (1, 33);
+INSERT INTO `roles_menus` VALUES (2, 1);
+INSERT INTO `roles_menus` VALUES (2, 5);
+INSERT INTO `roles_menus` VALUES (2, 7);
+INSERT INTO `roles_menus` VALUES (2, 11);
+INSERT INTO `roles_menus` VALUES (2, 28);
+
+-- ----------------------------
+-- Table structure for user_roles
+-- ----------------------------
+DROP TABLE IF EXISTS `user_roles`;
+CREATE TABLE `user_roles`  (
+                               `user_id` bigint NOT NULL COMMENT '用户ID',
+                               `role_id` bigint NOT NULL COMMENT '角色ID',
+                               PRIMARY KEY (`user_id`, `role_id`) USING BTREE,
+                               INDEX `role_id`(`role_id` ASC) USING BTREE,
+                               CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                               CONSTRAINT `user_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) COMMENT = '用户角色关联表' ;
+
+-- ----------------------------
+-- Records of user_roles
+-- ----------------------------
+INSERT INTO `user_roles` VALUES (1, 1);
+INSERT INTO `user_roles` VALUES (2, 2);
+
+-- ----------------------------
+-- Table structure for users
+-- ----------------------------
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users`  (
+                          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+                          `username` varchar(50)  NOT NULL COMMENT '用户名',
+                          `password` varchar(255)  NOT NULL COMMENT '密码',
+                          `email` varchar(100)  NULL DEFAULT NULL COMMENT '邮箱',
+                          `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                          `create_by` varchar(50) NULL DEFAULT NULL COMMENT '创建人',
+                          `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+                          `update_by` varchar(50) NULL DEFAULT NULL COMMENT '更新人',
+                          `del_flag` int NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+                          PRIMARY KEY (`id`) USING BTREE,
+                          UNIQUE INDEX `username`(`username` ASC) USING BTREE
+) COMMENT = '用户表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of users
+-- ----------------------------
+INSERT INTO `users` VALUES (1, 'admin', 'admin123', 'admin@example.com', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', 0);
+INSERT INTO `users` VALUES (2, 'user', 'admin123', 'user@example.com', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

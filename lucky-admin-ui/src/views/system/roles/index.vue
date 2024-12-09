@@ -251,7 +251,6 @@ export default {
     },
     // 菜单权限树复选框选中事件
     handleCheck(data, node) {
-      console.log('node', node)
       const ids = node.checkedKeys
       for (let i = 0; i < node.halfCheckedKeys.length; i++) {
         const id = node.halfCheckedKeys[i]
@@ -272,7 +271,6 @@ export default {
     },
     // 新增/修改弹窗打开渲染DOM后事件
     dialogOpened(row) {
-      console.log('row', row)
       if (row.name !== null) {
         const ids = row.menus
         this.selectedMenus(ids)

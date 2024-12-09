@@ -1,14 +1,12 @@
 server:
   port: 8080
   servlet:
-    context-path: /api
+    context-path: /prod-api
     encoding:
       charset: utf-8
 spring:
   application:
     name: lucky-admin-vue
-  profiles:
-    active: dev
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8

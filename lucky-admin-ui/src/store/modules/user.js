@@ -58,8 +58,6 @@ function formartRoutesRecursive(routers) {
       }
     }
     if (e.children && e.children.length > 0) {
-      console.log('进入')
-
       e.children = formartRoutesRecursive(e.children)
     }
     routersTree.push(e)
@@ -88,7 +86,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
-        console.log('userinfo', data)
         if (!data) {
           reject('验证失败,请重新登录')
         }
@@ -99,12 +96,9 @@ const actions = {
         if (!roles || roles.length <= 0) {
           reject('getInfo: 角色必须是非空数组!')
         }
-        console.log('routers', routers)
-
         const routerTree = formartRoutesRecursive(routers)
         // 将404页面添加到最后的路由中去
         routerTree.push({ path: '*', redirect: '/404', hidden: true })
-        console.log('routerTree', routerTree)
         commit('SET_ROLES', roles)
         commit('SET_USER_NAME', username)
         commit('SET_PERMISSIONS', permissions)

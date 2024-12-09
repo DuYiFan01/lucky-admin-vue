@@ -204,9 +204,7 @@ export default {
   methods: {
     // 分配角色表单提交
     submitFormByUser() {
-      console.log('transferValue', this.transferValue)
       this.formByUser.roleIds = this.transferValue
-      console.log('formByRole', this.formByUser)
       saveGrantByUser(this.formByUser).then(() => {
         this.$message({
           type: 'success',

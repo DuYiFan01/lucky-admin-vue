@@ -68,7 +68,6 @@ service.interceptors.response.use(
     // 不是未登录状态
     // 如果Code 小于 0 表示失败 则弹出错误信息
     if (res.code < 0) {
-      console.log(res.message)
       Message({
         message: res.message || 'Error',
         type: 'error',
