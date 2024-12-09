@@ -1,6 +1,6 @@
 package cn.anlucky.system.mapper;
 
-import cn.anlucky.system.pojo.Users;
+import cn.anlucky.system.pojo.system.Users;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;

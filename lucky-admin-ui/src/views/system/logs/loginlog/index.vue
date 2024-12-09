@@ -3,12 +3,6 @@
     <div v-permission="['system::logs::loginLog::list']" class="search-bar">
       <div class="grid-item">
         <span>
-          登录账号:
-        </span>
-        <el-input v-model="searchForm.username" placeholder="请输入登录账号" style="width: 200px;" />
-      </div>
-      <div class="grid-item">
-        <span>
           登录IP地址:
         </span>
         <el-input v-model="searchForm.ip" placeholder="请输入登录IP地址" style="width: 200px;" />
@@ -30,18 +24,6 @@
           操作系统:
         </span>
         <el-input v-model="searchForm.os" placeholder="请输入操作系统" style="width: 200px;" />
-      </div>
-      <div class="grid-item">
-        <span>
-          登录状态（0成功 1失败）:
-        </span>
-        <el-input v-model="searchForm.status" placeholder="请输入登录状态（0成功 1失败）" style="width: 200px;" />
-      </div>
-      <div class="grid-item">
-        <span>
-          提示消息:
-        </span>
-        <el-input v-model="searchForm.msg" placeholder="请输入提示消息" style="width: 200px;" />
       </div>
       <div class="grid-item">
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
@@ -81,15 +63,14 @@
       max-height="560"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="id" v-bind="columnProps" />
+      <el-table-column type="selection" width="55" v-bind="columnProps" />
+      <el-table-column type="index" width="50" label="序号" v-bind="columnProps" />
+      <!-- <el-table-column prop="id" label="id" v-bind="columnProps" /> -->
       <el-table-column prop="username" label="登录账号" v-bind="columnProps" />
       <el-table-column prop="ip" label="登录IP地址" v-bind="columnProps" />
       <el-table-column prop="ipAddr" label="登录地点" v-bind="columnProps" />
       <el-table-column prop="browser" label="浏览器类型" v-bind="columnProps" />
       <el-table-column prop="os" label="操作系统" v-bind="columnProps" />
-      <el-table-column prop="status" label="登录状态（0成功 1失败）" v-bind="columnProps" />
-      <el-table-column prop="msg" label="提示消息" v-bind="columnProps" />
       <el-table-column prop="createTime" label="访问时间" v-bind="columnProps" />
       <el-table-column
         v-if="checkPermission(['system::logs::loginLog::update', 'system::logs::loginLog::delete'])"

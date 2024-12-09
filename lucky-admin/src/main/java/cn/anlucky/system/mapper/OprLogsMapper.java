@@ -1,6 +1,6 @@
 package cn.anlucky.system.mapper;
 
-import cn.anlucky.system.pojo.OprLogs;
+import cn.anlucky.system.pojo.system.OprLogs;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

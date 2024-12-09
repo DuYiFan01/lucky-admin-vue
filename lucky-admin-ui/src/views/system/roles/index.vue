@@ -32,8 +32,9 @@
       max-height="560"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="角色ID" v-bind="columnProps" />
+      <el-table-column type="selection" width="55" v-bind="columnProps" />
+      <el-table-column type="index" width="50" label="序号" v-bind="columnProps" />
+      <!-- <el-table-column prop="id" label="角色ID" v-bind="columnProps" /> -->
       <el-table-column prop="name" label="角色名称" v-bind="columnProps" />
       <el-table-column prop="description" label="角色描述" v-bind="columnProps" />
       <el-table-column prop="createTime" label="创建时间" v-bind="columnProps" />

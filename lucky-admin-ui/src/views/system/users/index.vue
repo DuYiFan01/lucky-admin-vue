@@ -32,8 +32,9 @@
       max-height="560"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="用户ID" v-bind="columnProps" />
+      <el-table-column type="selection" width="55" v-bind="columnProps" />
+      <el-table-column type="index" width="50" label="序号" v-bind="columnProps" />
+      <!-- <el-table-column prop="id" label="用户ID" v-bind="columnProps" /> -->
       <el-table-column prop="username" label="用户名" v-bind="columnProps" />
       <el-table-column prop="password" label="密码" v-bind="columnProps" />
       <el-table-column prop="email" label="邮箱" v-bind="columnProps" />
@@ -41,7 +42,6 @@
       <el-table-column prop="createBy" label="创建人" v-bind="columnProps" />
       <el-table-column prop="updateTime" label="更新时间" v-bind="columnProps" />
       <el-table-column prop="updateBy" label="更新人" v-bind="columnProps" />
-      <el-table-column prop="delFlag" label="逻辑删除标志，0-未删除，1-已删除" v-bind="columnProps" />
       <el-table-column
         v-if="checkPermission(['system::users::grant', 'system::users::update', 'system::users::delete'])"
         label="操作"

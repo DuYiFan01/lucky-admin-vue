@@ -1,6 +1,7 @@
 package cn.anlucky.system.exception;
 
 import cn.anlucky.system.enums.Code;
+import cn.anlucky.system.pojo.system.LoginLog;
 import cn.anlucky.vo.R;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;

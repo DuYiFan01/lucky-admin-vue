@@ -1,7 +1,7 @@
 package cn.anlucky.system.listener;
 
-import cn.anlucky.system.pojo.LoginLog;
-import cn.anlucky.system.service.LoginLogService;
+import cn.anlucky.system.pojo.system.LoginLog;
+import cn.anlucky.system.service.system.LoginLogService;
 import cn.anlucky.system.utils.AddressUtils;
 import cn.anlucky.system.utils.IpUtils;
 import cn.anlucky.system.utils.ServletUtils;
@@ -27,26 +27,6 @@ public class SaTokenListenerConfig implements SaTokenListener {
      */
     @Override
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginModel loginModel) {
-
-        String username = "admin";
-        String ip = IpUtils.getIpAddr();
-        String ipAddr = AddressUtils.getRealAddressByIP(ip);
-        UserAgent userAgent = UserAgent.parseUserAgentString(ServletUtils.getRequest().getHeader("User-Agent"));
-        // 获取操作系统
-        String os = userAgent.getOperatingSystem().getName();
-        // 获取客户端浏览器
-        String browser = userAgent.getBrowser().getName();
-        LoginLog loginLog = new LoginLog();
-        loginLog.setUsername(username);
-        loginLog.setIp(ip);
-        loginLog.setIpAddr(ipAddr);
-        loginLog.setBrowser(browser);
-        loginLog.setOs(os);
-        loginLog.setStatus("0");
-        loginLog.setMsg("登录成功");
-        loginLog.setCreateTime(LocalDateTime.now());
-        System.out.println("tokenValue = " + tokenValue);
-        // loginLogService.save(loginLog);
         System.out.println("---------- 自定义侦听器实现 doLogin");
     }
 

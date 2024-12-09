@@ -3,7 +3,7 @@
 <mapper namespace="cn.anlucky.system.mapper.UserRolesMapper">
 
         <!-- 通用查询映射结果 -->
-        <resultMap id="BaseResultMap" type="cn.anlucky.system.pojo.UserRoles">
+        <resultMap id="BaseResultMap" type="cn.anlucky.system.pojo.system.UserRoles">
                     <id column="user_id" property="userId" />
                     <id column="role_id" property="roleId" />
         </resultMap>

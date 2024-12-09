@@ -1,6 +1,6 @@
 package cn.anlucky.system.mapper;
 
-import cn.anlucky.system.pojo.RolesMenus;
+import cn.anlucky.system.pojo.system.RolesMenus;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

@@ -3,7 +3,7 @@
 <mapper namespace="cn.anlucky.system.mapper.RolesMenusMapper">
 
         <!-- 通用查询映射结果 -->
-        <resultMap id="BaseResultMap" type="cn.anlucky.system.pojo.RolesMenus">
+        <resultMap id="BaseResultMap" type="cn.anlucky.system.pojo.system.RolesMenus">
                     <id column="role_id" property="roleId" />
                     <id column="menu_id" property="menuId" />
         </resultMap>

@@ -1,6 +1,6 @@
 package cn.anlucky.system.vo;
 
-import cn.anlucky.system.pojo.Roles;
+import cn.anlucky.system.pojo.system.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

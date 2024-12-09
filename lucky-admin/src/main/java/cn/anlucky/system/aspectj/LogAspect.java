@@ -2,8 +2,8 @@ package cn.anlucky.system.aspectj;
 
 import cn.anlucky.system.annotation.Log;
 import cn.anlucky.system.enums.BusinessStatus;
-import cn.anlucky.system.pojo.OprLogs;
-import cn.anlucky.system.service.OprLogsService;
+import cn.anlucky.system.pojo.system.OprLogs;
+import cn.anlucky.system.service.system.OprLogsService;
 import cn.anlucky.system.utils.IpUtils;
 import cn.anlucky.system.utils.Sa;
 import cn.anlucky.system.utils.ServletUtils;

@@ -36,12 +36,6 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-  // 404
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
   // index
   {
     path: '/',
@@ -52,7 +46,19 @@ export const constantRoutes = [
       name: '首页',
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
-    }]
+    },
+    {
+      path: '/403',
+      component: () => import('@/views/403'),
+      hidden: true
+    },
+    // 404
+    {
+      path: '/404',
+      component: () => import('@/views/404'),
+      hidden: true
+    }
+    ]
   }
 
 ]

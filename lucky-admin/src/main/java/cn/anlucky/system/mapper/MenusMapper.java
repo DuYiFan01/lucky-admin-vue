@@ -1,6 +1,6 @@
 package cn.anlucky.system.mapper;
 
-import cn.anlucky.system.pojo.Menus;
+import cn.anlucky.system.pojo.system.Menus;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;

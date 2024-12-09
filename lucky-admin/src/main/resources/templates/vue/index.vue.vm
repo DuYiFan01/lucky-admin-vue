@@ -1,0 +1,369 @@
+<template>
+  <div class="user-management">
+    <div v-permission="['${package.ModuleName}::${table.entityPath}::list']" class="search-bar">
+#foreach($field in ${table.fields})
+  #set($params = ${table.entityPath})
+  #set($getFuncation = $params+".get"+${field.capitalName}+"()")
+  #set($type = ${field.propertyType})
+  #set($pojo=${entity})
+  #set($capitalName = ${field.capitalName})
+  #set($paramsName=${field.comment})
+  #set($columnProps=${field.propertyName})
+  ## 排除逻辑删除和自动填充字段和主键
+  #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+    #if ($type=='String')
+    <div class="grid-item">
+      <span>
+          $paramsName:
+      </span>
+      <el-input
+              v-model="searchForm.$columnProps"
+              placeholder="请输入${paramsName}"
+              style="width: 200px;"
+      />
+    </div>
+    #end
+  #end
+#end
+      <div class="grid-item">
+        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+      </div>
+    </div>
+    <div v-permission="['${package.ModuleName}::${params}::insert','${package.ModuleName}::${params}::delete','${package.ModuleName}::${params}::import','${package.ModuleName}::${params}::export','${package.ModuleName}::${params}::list']" class="button-bar">
+      <el-button v-permission="['${package.ModuleName}::${params}::insert']" :type="buttonBar.insertType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleAdd" >新增项目</el-button>
+      <el-button v-permission="['${package.ModuleName}::${params}::delete']" :type="buttonBar.deleteType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleBatchDelete" >批量删除</el-button>
+      <el-button v-permission="['${package.ModuleName}::${params}::import']" :type="buttonBar.importType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleImport" >导入</el-button>
+      <el-button v-permission="['${package.ModuleName}::${params}::export']" :type="buttonBar.exportType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleExport" >导出</el-button>
+      <el-button v-permission="['${package.ModuleName}::${params}::list']" :type="buttonBar.reFreshType" :size="buttonBar.size" :plain="buttonBar.plain" @click="handleRefresh" >刷新</el-button>
+    </div>
+    <el-table
+            v-loading.fullscreen.lock ="tableLoading"
+            :data="tableData"
+            style="width: 100%"
+            border
+            max-height="560"
+            @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="55" />
+      <el-table-column type="index" width="50" label="序号" v-bind="columnProps" />
+      #foreach($field in ${table.fields})
+  #set($paramsName=${field.comment})
+  #set($columnProps=${field.propertyName})
+      <el-table-column prop="$columnProps" label="$paramsName" v-bind="columnProps" />
+#end
+      <el-table-column
+              v-if="checkPermission(['${package.ModuleName}::${params}::update','${package.ModuleName}::${params}::delete'])"
+              label="操作"
+              width="200"
+              fixed="right"
+              :header-align="tableConfig.headerAlign"
+              align="center"
+      >
+        <template slot-scope="scope">
+          <el-button v-permission="['${package.ModuleName}::${params}::update']" :size="toolBar.size" :type="toolBar.updateType" :icon="toolBar.updateIcon" @click="handleEdit(scope.row)" >编辑</el-button>
+          <el-button v-permission="['${package.ModuleName}::${params}::delete']" :size="toolBar.size" :type="toolBar.deleteType" :icon="toolBar.deleteIcon" @click="handleDelete(scope.row.id)" >删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="pagination">
+      <el-pagination
+              :current-page="currentPage"
+              :page-sizes="[1, 10, 20, 50, 100]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+      />
+    </div>
+    <!-- 新增/编辑用户对话框 -->
+    <el-dialog
+            :title="dialogTitle"
+            :visible.sync="dialogVisible"
+            width="500px"
+            :close-on-click-modal="false"
+            center
+    >
+      <el-form ref="form" :model="form" :rules="rules">
+        #foreach($field in ${table.fields})
+          #set($paramsName=${field.comment})
+          #set($columnProps=${field.propertyName})
+          #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+            <el-form-item label="$paramsName" prop="$columnProps">
+            <el-input v-model="form.$columnProps" autocomplete="off" />
+          </el-form-item>
+          #end
+        #end
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import { deleteByIds, pageByParams, updateSpecifyById, save } from '@/api/${package.ModuleName}/${table.entityPath}'
+
+  export default {
+    data() {
+      return {
+        tableLoading: false,
+        // 表格样式设置
+        tableConfig: {
+          tooltip: true, // 表格内容长度过长时鼠标悬浮显示
+          columnWidth: '180px', // 表格宽度
+          align: 'center', // 内容对齐方式
+          headerAlign: 'center' // 标题对齐方式
+        },
+        // 新增/修改弹窗开关
+        dialogVisible: false,
+        // 新增/修改弹窗标题
+        dialogTitle: '',
+        // 新增按钮被点击时为 insert 修改按钮被点击时值为 update
+        dialogType: '',
+        // 当前页码
+        currentPage: 1,
+        // 页码显示条数
+        pageSize: 10,
+        // 数据总条数
+        total: 0,
+        // 表格数据
+        tableData: [],
+        // 搜索条件
+        searchForm: {
+      #foreach($field in ${table.fields})
+        #set($paramsName=${field.comment})
+        #set($columnProps=${field.propertyName})
+        #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+          #if ($type=='String')
+              $columnProps: null, // $paramsName
+          #end
+        #end
+      #end
+        },
+        // 复选框选择的主键
+        selectedIds: [],
+        // 新增修改表单
+        form: {
+          #foreach($field in ${table.fields})
+            #set($paramsName=${field.comment})
+            #set($columnProps=${field.propertyName})
+            ## 排除逻辑删除和自动填充字段和主键
+            #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+            $columnProps: null, // $paramsName
+          #end
+          #end
+        },
+        // 表单前端校验是否输入
+        rules: {
+          #foreach($field in ${table.fields})
+            #set($paramsName=${field.comment})
+            #set($columnProps=${field.propertyName})
+            ## 排除逻辑删除和自动填充字段和主键
+            #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+              $columnProps: [
+              { required: true, message: '请输入$paramsName', trigger: 'blur' }
+            ],
+            #end
+          #end
+        }
+      }
+    },
+    computed: {
+      // 计算属性
+      columnProps() {
+        return {
+          showOverflowTooltip: this.tableConfig.tooltip,
+          headerAlign: this.tableConfig.headerAlign,
+          align: this.tableConfig.align,
+          width: this.tableConfig.width
+        }
+      }
+    },
+    created() {
+      this.getTableData({}, this.currentPage, this.pageSize)
+    },
+    methods: {
+      // 表格初始化获取数据
+      getTableData(data, currentPage, pageSize) {
+        this.tableLoading = true
+        pageByParams(data, currentPage, pageSize).then(res => {
+          const { data } = res
+          // console.log(data);
+          this.currentPage = data.currentPage
+          this.pageSize = data.pageSize
+          this.total = data.total
+          this.tableData = data.data
+          this.tableLoading = false
+        }).catch(error => {
+          this.#[[$]]#message.error(error)
+          this.tableLoading = false
+          // console.log(error)
+        })
+      },
+      // 新增按钮被点击
+      handleAdd() {
+        this.dialogTitle = '新增'
+        this.dialogVisible = true
+        this.dialogType = 'insert'
+        this.resetForm()
+      },
+      // 编辑按钮被点击
+      handleEdit(row) {
+        this.dialogTitle = '编辑'
+        this.dialogType = 'update'
+        this.form = { ...row }
+        this.dialogVisible = true
+      },
+      // 删除按钮被点击
+      handleDelete(id) {
+        this.#[[$]]#confirm('此操作将删除此条数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // console.log(id)
+          deleteByIds(id).then(() => {
+            this.#[[$]]#message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.handlePagination()
+          }).catch(error => {
+            this.#[[$]]#message.error(error)
+            // console.log(error)
+          })
+        }).catch(() => {
+          this.#[[$]]#message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
+      // 批量删除按钮被点击
+      handleBatchDelete() {
+        if (this.selectedIds.length <= 0) {
+          this.#[[$]]#message({
+            type: 'warning',
+            message: '请选择要删除的数据'
+          })
+          return
+        }
+        this.#[[$]]#confirm('此操作将删除此条数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteByIds(this.selectedIds).then(() => {
+            this.#[[$]]#message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.handlePagination()
+          }).catch(error => {
+            this.#[[$]]#message.error(error)
+            // console.log(error)
+          })
+        })
+      },
+      // 搜索按钮被点击
+      handleSearch() {
+        this.handlePagination()
+      },
+      // 行数据复选框被选中
+      handleSelectionChange(selection) {
+        this.selectedUsers = selection
+        this.selectedIds = selection.map(obj => obj.id)
+        // console.log(selection);
+        // console.log(this.selectedIds);
+      },
+      // 导入按钮被点击
+      handleImport() {
+        // console.log('数据导入');
+      },
+      // 导出按钮被点击
+      handleExport() {
+        // 假设这里有一个API调用导出用户
+        // console.log('数据导出');
+      },
+      // 刷新按钮被点击
+      handleRefresh() {
+        this.handlePagination()
+      },
+      handleSizeChange(newSize) {
+        this.pageSize = newSize
+        // console.log("页面显示条数被改变：" + newSize + "条");
+        this.handlePagination()
+      },
+      // 页码被改变
+      handleCurrentChange(newPage) {
+        this.currentPage = newPage
+        // console.log("页码被改变：" + newPage);
+        this.handlePagination()
+      },
+      // 页码改变/页面显示条数改变
+      handlePagination() {
+        this.getTableData(this.searchForm, this.currentPage, this.pageSize)
+      },
+      // 重置表单
+      resetForm() {
+        const resetForm = {
+          #foreach($field in ${table.fields})
+        #set($paramsName=${field.comment})
+        #set($columnProps=${field.propertyName})
+      ## 排除逻辑删除和自动填充字段和主键
+        #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+        $columnProps: null, // $paramsName
+                #end
+        #end
+      }
+        this.form = resetForm
+        // console.log(this.form);
+      },
+      // 新增/修改表单提交
+      submitForm() {
+        this.#[[$]]#refs.form.validate((valid) => {
+        if (valid) {
+        if (this.dialogType === 'insert') {
+        // 新增
+        save(this.form).then(() => {
+        this.$message({
+        type: 'success',
+        message: '新增成功!'
+        })
+        this.handlePagination()
+        }).catch(error => {
+        this.$message.error(error)
+        // console.log(error)
+        })
+        } else if (this.dialogType === 'update') {
+        // 修改
+        updateSpecifyById(this.form).then(() => {
+        this.$message({
+        type: 'success',
+        message: '修改成功!'
+        })
+        this.handlePagination()
+        }).catch(error => {
+        this.$message.error(error)
+        // console.log(error)
+        })
+        } else {
+        this.$message.$error('请选择要操作的数据')
+        return false
+        }
+        this.dialogVisible = false
+        } else {
+        // console.log('表单验证失败');
+        }
+        })
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>

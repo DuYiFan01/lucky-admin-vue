@@ -55,6 +55,16 @@ service.interceptors.response.use(
       })
       return Promise.reject(new Error(res.message || 'Error'))
     }
+    // 如果是没有权限,跳转403页面
+    if (res.code === '-403') {
+      Message({
+        message: res.message || 'Error',
+        type: 'error',
+        duration: 5 * 1000
+      })
+      return
+    }
+
     // 不是未登录状态
     // 如果Code 小于 0 表示失败 则弹出错误信息
     if (res.code < 0) {

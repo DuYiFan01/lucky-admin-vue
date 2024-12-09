@@ -43,7 +43,7 @@
       </div>
       <div class="grid-item">
         <span>
-          业务类型:
+          操作状态:
         </span>
         <el-select v-model="searchForm.status" placeholder="操作状态" style="width: 200px; ">
           <el-option v-for="item in statusItem" :key="item.value" :label="item.label" :value="item.value" />
@@ -90,8 +90,9 @@
       max-height="560"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="日志主键" v-bind="columnProps" />
+      <el-table-column type="selection" width="55" v-bind="columnProps" />
+      <el-table-column type="index" width="50" label="序号" v-bind="columnProps" />
+      <!-- <el-table-column prop="id" label="日志主键" v-bind="columnProps" /> -->
       <el-table-column prop="title" label="模块标题" v-bind="columnProps" />
       <el-table-column prop="businessType" label="业务类型" v-bind="columnProps">
         <template slot-scope="scope">
@@ -108,7 +109,7 @@
       <el-table-column prop="ip" label="主机地址" v-bind="columnProps" />
       <el-table-column prop="param" label="请求参数" v-bind="columnProps" />
       <el-table-column prop="result" label="返回参数" v-bind="columnProps" />
-      <el-table-column prop="status" label="操作状态（0正常 1异常）" v-bind="columnProps">
+      <el-table-column prop="status" label="操作状态" v-bind="columnProps">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" type="danger">异常</el-tag>
           <el-tag v-if="scope.row.status === 0" type="success">正常</el-tag>
@@ -178,7 +179,7 @@ export default {
       // 复选框选择的主键
       selectedIds: [],
       // 请求方式
-      requestMenthods:[
+      requestMenthods: [
         { value: null, label: '全部' },
         { value: 'GET', label: 'GET' },
         { value: 'POST', label: 'POST' },
@@ -186,18 +187,18 @@ export default {
         { value: 'DELETE', label: 'DELETE' }
       ],
       // 业务类型
-      businessTypes:[
+      businessTypes: [
         { value: null, label: '全部' },
         { value: 1, label: '新增' },
         { value: 2, label: '修改' },
         { value: 3, label: '删除' },
         { value: 0, label: '其他' }
       ],
-      statusItem:[
+      statusItem: [
         { value: null, label: '全部' },
         { value: 1, label: '异常' },
         { value: 0, label: '正常' }
-      ],
+      ]
     }
   },
   computed: {
