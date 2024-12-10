@@ -7,7 +7,7 @@ import { getToken, TokenKey } from '@/utils/auth'
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL + process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 20000 // request timeout
 })
 console.log('请求URL:' + process.env.VUE_APP_BASE_URL + process.env.VUE_APP_BASE_API)
 
@@ -15,7 +15,6 @@ console.log('请求URL:' + process.env.VUE_APP_BASE_URL + process.env.VUE_APP_BA
 service.interceptors.request.use(
   config => {
     // do something before request is sent
-
     if (store.getters.token) {
       // let each request carry token
       // ['X-Token'] is a custom headers key
@@ -33,14 +32,12 @@ service.interceptors.request.use(
 
 // response interceptor
 service.interceptors.response.use(
-
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
   */
   response => {
     const res = response.data
-
     // 未登录状态码
     if (res.code === '-401') {
       // to re-login
@@ -62,9 +59,8 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
-      return
+      return res
     }
-
     // 不是未登录状态
     // 如果Code 小于 0 表示失败 则弹出错误信息
     if (res.code < 0) {
