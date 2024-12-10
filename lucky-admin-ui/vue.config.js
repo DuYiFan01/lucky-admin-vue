@@ -25,9 +25,13 @@ module.exports = {
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
   publicPath: '/',
+  // 在npm run build 或 yarn build 时 ，生成文件的目录名称（要和baseUrl的生产环境路径一致）（默认dist）
   outputDir: 'dist',
+  // 用于放置生成的静态资源 (js、css、img、fonts) 的；（项目打包之后，静态资源会放在这个文件夹下）
   assetsDir: 'static',
+  // 是否开启eslint保存检测，有效值：ture | false | 'error'
   lintOnSave: process.env.NODE_ENV === 'development',
+  // 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
   productionSourceMap: false,
   devServer: {
     port: port,
@@ -37,18 +41,13 @@ module.exports = {
       errors: true
     },
     proxy: {
-      // with options
-      '/dev-api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        logLevel: 'debug'
-      },
-      '/prod-api': {
-        target: 'http://localhost:8080',
+      [process.env.VUE_APP_BASE_API]: {
+        target: process.env.VUE_APP_BASE_URL || 'http://localhost:8080',
         changeOrigin: true,
         logLevel: 'debug'
       }
     },
+    // 如果使用代理配置，将需要将这一行注释掉，否则代理请求虽然请求出去了但是无法获得响应
     // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
@@ -111,7 +110,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()

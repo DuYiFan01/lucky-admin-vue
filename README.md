@@ -1,16 +1,17 @@
 # Lucky-Admin-Vue
 
 #### 介绍
-Lucky-Admin-Vue 一个基于vue-admin-template的后台管理框架，集成了动态角色权限，动态路由，Sa-Token权限校验，快速构建一个管理后台的框架
+Lucky-Admin-Vue 一个基于vue-admin-template的后台管理框架，集成了动态角色权限，动态路由，日志管理，Sa-Token权限校验，快速构建一个管理后台的框架
 #### 软件架构
 ##### 开发环境
 ###### 后端
--   JDK 1.8+
--   MySQL 5.7+
-  -  Maven 3.6+
+- JDK 1.8+
+- SpringBoot 3
+- MySQL 5.7+ 
+- Maven 3.6+
 ###### 前端
 - vue 2
--   node.js 18.0+
+- node.js 18.0+
 ##### 后端目录架构
 ```
 src
@@ -87,26 +88,36 @@ src
         └─users         # 用户相关
 ```
 #### 安装教程
+
+1. 创建数据库
+2. 导入SQL目录下的数据库文件创建表以及基础的数据
+3. 修改前端 .env.production 文件中在生产环境中调用的API URL 
+4. 打包前端项目 上传至服务器
+5. 修改后端 application.yml 文件中(spring.profiles.active = prod)
+6. 修改application-prod.yml文件中数据库配置
+7. 打包后端项目 上传至服务器
+8. 前端可配合Nginx进行反向代理
+
+~~~ linux
+    java -jar lucky-admin-vue.jar
+~~~
+
 ##### 前端打包教程
 
 1. 确认是否有node环境以及版本在18.0以上
 2. 进入根目录执行 npm install 下载依赖包
-3. 执行 npm run dev 启动项目(确认是否可以正常运行)
-4. 执行 npm run build:prod 打包线上环境项目(dir: dist)
-5. 将 dist 目录中的文件上传至服务器
+3. 设置修改 .env.production 文件中的后端请求地址 
+4. 执行 npm run dev 启动项目(确认是否可以正常运行)
+5. 执行 npm run build:prod 打包线上环境项目(dir: dist)
+6. 将 dist 目录中的文件上传至服务器
 
 ##### 后端打包教程
 
 1. 确认是否有jdk环境以及版本在1.8以上执行
-2. 修改application.yml文件中使用配置文件的配置(spring.profiles.active = prd)
-3. 修改application-prd.yml文件中数据库配置
+2. 修改application.yml文件中使用配置文件的配置(spring.profiles.active = prod)
+3. 修改application-prod.yml文件中数据库配置
 4. 执行 mvn clean package -Dmaven.test.skip=true 打包项目(dir: target)
 5. 在target中找到项目名.jar包上传至服务器
-
-##### 部署安装
-
-1. 创建数据库
-2. 导入SQL目录下的数据库文件创建表以及基础的数据
 
 #### 待完善功能
 
@@ -116,7 +127,8 @@ src
 4. 代码生成工具可视化
 5. 集成Excel导入导出
 6. 集成图片上传下载
-7. 待添加......
+7. 增加用户头像修改、密码加密、登录逻辑优化
+8. 待添加......
 
 #### 项目截图
 ![img.png](img.png)
