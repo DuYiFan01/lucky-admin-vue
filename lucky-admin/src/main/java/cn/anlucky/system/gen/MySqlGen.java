@@ -49,7 +49,7 @@ public class MySqlGen extends BaseController {
                             builder -> builder.disableOpenDir() // 允许自动打开输出目录
                                     .outputDir(outputDirectory) // 设置输出目录
                                     .author(author) // 设置作者名
-                                    .enableSwagger() // 开启 Swagger 模式
+                                    .enableSpringdoc() // 开启 Swagger 模式
                                     .dateType(DateType.TIME_PACK) // 设置时间类型策略
                                     .commentDate("yyyy-MM-dd HH:mm:ss") // 设置注释日期格式)
                                     .build())

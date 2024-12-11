@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -17,16 +16,16 @@ import lombok.Data;
  */
 @Data
 @TableName("roles_menus")
-@ApiModel(value = "RolesMenus对象", description = "角色和菜单关联表")
+@Schema(name = "RolesMenus", description = "角色和菜单关联表")
 public class RolesMenus implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("角色ID")
+    @Schema(description = "角色ID")
     @TableId("role_id")
     private Long roleId;
 
-    @ApiModelProperty("菜单ID")
+    @Schema(description = "菜单ID")
     @TableField("menu_id")
     private Long menuId;
 }

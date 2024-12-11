@@ -66,7 +66,7 @@ public class Sa {
      * 注销当前登录
      */
     public static void logout() {
-        StpUtil.logout(getLoginId());
+        StpUtil.logoutByTokenValue(getToken());
     }
 
     /**

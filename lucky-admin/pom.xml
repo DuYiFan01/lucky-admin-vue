@@ -37,6 +37,7 @@
         <springfox.version>3.0.0</springfox.version>
         <oshi.version>6.6.5</oshi.version>
         <useragent.version>1.21</useragent.version>
+        <springdoc.version>2.6.0</springdoc.version>
     </properties>
     <dependencies>
         <dependency>
@@ -118,9 +119,9 @@
         </dependency>
         <!--swagger 3-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>${springfox.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

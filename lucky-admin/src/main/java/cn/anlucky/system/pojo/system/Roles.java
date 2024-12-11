@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 
@@ -24,42 +24,42 @@ import lombok.Data;
  */
 @Data
 @TableName("roles")
-@ApiModel(value = "Roles对象", description = "角色表")
+@Schema(name = "Roles", description = "角色表")
 public class Roles implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("角色ID")
+    @Schema(description = "角色ID")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty("角色名称")
+    @Schema(description = "角色名称")
     @TableField("`name`")
     private String name;
 
-    @ApiModelProperty("角色描述")
+    @Schema(description = "角色描述")
     @TableField("`description`")
     private String description;
 
-    @ApiModelProperty("创建时间")
+    @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    @ApiModelProperty("创建人")
+    @Schema(description = "创建人")
     @TableField(value = "create_by", fill = FieldFill.INSERT)
     private String createBy;
 
-    @ApiModelProperty("更新时间")
+    @Schema(description = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
-    @ApiModelProperty("更新人")
+    @Schema(description = "更新人")
     @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
-    @ApiModelProperty("角色拥有的菜单权限")
+    @Schema(description = "角色拥有的菜单权限")
     @TableField(exist = false)
     private List<Long> menus;
 }

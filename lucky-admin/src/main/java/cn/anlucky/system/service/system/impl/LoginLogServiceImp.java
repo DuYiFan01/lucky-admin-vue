@@ -27,7 +27,6 @@ import java.util.Objects;
  * @since 2024-12-03 14:49:27
  */
 @Service
-@EnableAsync
 public class LoginLogServiceImp extends ServiceImpl<LoginLogMapper, LoginLog> implements LoginLogService {
 
 

@@ -10,8 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -23,94 +22,94 @@ import lombok.Data;
  */
 @Data
 @TableName("menus")
-@ApiModel(value = "Menus对象", description = "菜单表")
+@Schema(name = "Menus", description = "菜单表")
 public class Menus implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("菜单ID")
+    @Schema(description = "菜单ID")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty("路由名称")
+    @Schema(description = "路由名称")
     @TableField("`name`")
     private String name;
 
-    @ApiModelProperty("菜单名称")
+    @Schema(description = "菜单名称")
     @TableField("title")
     private String title;
 
-    @ApiModelProperty("父菜单ID")
+    @Schema(description = "父菜单ID")
     @TableField("parent_id")
     private Long parentId;
 
-    @ApiModelProperty("显示顺序")
+    @Schema(description = "显示顺序")
     @TableField("order_num")
     private Integer orderNum;
 
-    @ApiModelProperty("路由地址")
+    @Schema(description = "路由地址")
     @TableField("`path`")
     private String path;
 
-    @ApiModelProperty("组件路径")
+    @Schema(description = "组件路径")
     @TableField("`component`")
     private String component;
 
-    @ApiModelProperty("路由参数")
+    @Schema(description = "路由参数")
     @TableField("`query`")
     private String query;
 
-    @ApiModelProperty("是否为外链（1是 0否）")
+    @Schema(description = "是否为外链（1是 0否）")
     @TableField("is_frame")
     private Integer isFrame;
 
-    @ApiModelProperty("是否缓存（1缓存 0不缓存）")
+    @Schema(description = "是否缓存（1缓存 0不缓存）")
     @TableField("is_cache")
     private Integer isCache;
 
-    @ApiModelProperty("菜单类型（M目录 C菜单 F按钮）")
+    @Schema(description = "菜单类型（M目录 C菜单 F按钮）")
     @TableField("menu_type")
     private String menuType;
 
-    @ApiModelProperty("菜单状态（1显示 0隐藏）")
+    @Schema(description = "菜单状态（1显示 0隐藏）")
     @TableField("`visible`")
     private Integer visible;
 
-    @ApiModelProperty("权限标识")
+    @Schema(description = "权限标识")
     @TableField("roles")
     private String roles;
 
-    @ApiModelProperty("菜单图标")
+    @Schema(description = "菜单图标")
     @TableField("icon")
     private String icon;
 
-    @ApiModelProperty("创建时间")
+    @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    @ApiModelProperty("创建人")
+    @Schema(description = "创建人")
     @TableField(value = "create_by", fill = FieldFill.INSERT)
     private String createBy;
 
-    @ApiModelProperty("更新时间")
+    @Schema(description = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
-    @ApiModelProperty("更新人")
+    @Schema(description = "更新人")
     @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
-    @ApiModelProperty("备注")
+    @Schema(description = "备注")
     @TableField("remark")
     private String remark;
 
-    @ApiModelProperty("用户ID")
+    @Schema(description = "用户ID")
     @TableField(exist = false)
     private String uid;
 
-    @ApiModelProperty("子菜单")
+    @Schema(description = "子菜单")
     @TableField(exist = false)
     private List<Menus> children;
 }

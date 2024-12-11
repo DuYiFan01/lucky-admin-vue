@@ -65,8 +65,8 @@ INSERT INTO `menus` VALUES (NULL, 'logs', '日志管理', 1, 4, '/system/logs', 
 INSERT INTO `menus` VALUES (NULL, 'operlog', '操作日志', 5, 1, '/system/logs/operlog', '/system/logs/operlog/index', NULL, 0, 1, 'C', 1, '', 'form', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
 INSERT INTO `menus` VALUES (NULL, 'loginlog', '登录日志', 5, 2, '/system/logs/loginlog', '/system/logs/loginlog/index', NULL, 0, 1, 'C', 1, '', 'logininfor', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
 INSERT INTO `menus` VALUES (NULL, '', '用户新增', 2, 2, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::insert', '#',CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
-INSERT INTO `menus` VALUES (NULL, 'tool', '系统工具', 0, 2, '/tool', NULL, NULL, 0, 1, 'M', 1, NULL, 'tool', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
-INSERT INTO `menus` VALUES (NULL, 'swagger', '系统接口', 9, 1, '/tool/swagger', '/tool/swagger/index', NULL, 0, 1, 'C', 1, '', 'swagger', CURRENT_TIMESTAMP, 'system',CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'tools', '系统工具', 0, 2, '/tools', NULL, NULL, 0, 1, 'M', 1, NULL, 'tool', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
+INSERT INTO `menus` VALUES (NULL, 'swagger', '系统接口', 9, 1, '/tools/swagger', '/tools/swagger/index', NULL, 0, 1, 'C', 1, '', 'swagger', CURRENT_TIMESTAMP, 'system',CURRENT_TIMESTAMP, 'system', '');
 INSERT INTO `menus` VALUES (NULL, 'MyGitee', 'Gitee地址', 0, 4, 'https://gitee.com/xiaodu6/lucky-admin-vue', NULL, NULL, 1, 1, 'M', 1, NULL, 'guide', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
 INSERT INTO `menus` VALUES (NULL, NULL, '菜单查询', 3, 1, '', NULL, NULL, 0, 1, 'F', 1, 'system::menus::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
 INSERT INTO `menus` VALUES (NULL, NULL, '用户查询', 2, 1, '', NULL, NULL, 0, 1, 'F', 1, 'system::users::list', '#', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', '');
