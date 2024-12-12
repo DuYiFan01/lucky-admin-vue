@@ -2,6 +2,7 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken, TokenKey } from '@/utils/auth'
+import router from '@/router'
 
 // create an axios instance
 const service = axios.create({
@@ -59,6 +60,8 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
+      // console.log("this",this.$router({name: '403'}));
+      router.push('/403')
       return res
     }
     // 不是未登录状态
