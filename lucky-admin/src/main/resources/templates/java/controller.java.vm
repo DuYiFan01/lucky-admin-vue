@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 #else
 @Controller
 #end
+@Tag(name = "$!{table.comment}前端控制器")
 @RequiredArgsConstructor
 @RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
 #if(${kotlin})
@@ -41,6 +42,7 @@ public class ${table.controllerName} {
      * 查询所有
      * @return
      */
+    @Operation(summary = "查询所有${entity}")
     @SaCheckPermission("${package.ModuleName}::${params}::list")
     @PostMapping("/list")
     public R list() {
@@ -53,6 +55,7 @@ public class ${table.controllerName} {
     * @param ${table.entityPath}
     * @return
     */
+    @Operation(summary = "条件分页查询${entity}")
     @SaCheckPermission("${package.ModuleName}::${params}::list")
     @PostMapping("/pageByParams")
     public R listByPage(@RequestBody ${entity} ${table.entityPath}) {
@@ -67,6 +70,7 @@ public class ${table.controllerName} {
     * @param id
     * @return
     */
+    @Operation(summary = "id查询一个${entity}")
     @SaCheckPermission("${package.ModuleName}::${params}::list")
     @GetMapping("/get/{id}")
     public R getById(@PathVariable(name = "id") Serializable id) {
@@ -79,6 +83,7 @@ public class ${table.controllerName} {
     * @param ${table.entityPath}
     * @return
     */
+    @Operation(summary = "新增${entity}")
     @SaCheckPermission("${package.ModuleName}::${params}::insert")
     @Log(title = "$!{table.comment}", businessType = BusinessType.INSERT)
     @PostMapping("/save")
@@ -95,6 +100,7 @@ public class ${table.controllerName} {
     * @param ${table.entityPath}
     * @return
     */
+    @Operation(summary = "修改${entity}所有字段为新值")
     @SaCheckPermission("${package.ModuleName}::${params}::update")
     @Log(title = "$!{table.comment}", businessType = BusinessType.UPDATE)
     @PostMapping("/updateAllById")
@@ -108,6 +114,7 @@ public class ${table.controllerName} {
     * @param ${table.entityPath}
     * @return
     */
+    @Operation(summary = "修改${entity}指定字段为新值")
     @SaCheckPermission("${package.ModuleName}::${params}::update")
     @Log(title = "$!{table.comment}", businessType = BusinessType.UPDATE)
     @PostMapping("/updateSpecifyById")
@@ -121,6 +128,7 @@ public class ${table.controllerName} {
     * @param ids
     * @return
     */
+    @Operation(summary = "批量删除和删除${entity}")
     @SaCheckPermission("${package.ModuleName}::${params}::delete")
     @Log(title = "$!{table.comment}", businessType = BusinessType.DELETE)
     @GetMapping("/delete/{ids}")

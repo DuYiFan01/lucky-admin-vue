@@ -110,7 +110,6 @@ public class MybatisPlusGenerationConfig {
                         new Column(createByField, FieldFill.INSERT),
                         new Column(updateByField, FieldFill.INSERT_UPDATE)
                 )
-                .logicDeleteColumnName("del_flag")
                 .formatFileName("%s")
                 .javaTemplate("/templates/java/entity.java")
                 // .disable() // 禁用实体类生成
@@ -219,7 +218,7 @@ public class MybatisPlusGenerationConfig {
      * @return
      */
     public Map<String,String> previewCode(String tableName) {
-
+        // 获取配置
         ConfigBuilder configBuilder = new ConfigBuilder(
                 this.getPackageConfigBuilder().build(),
                 this.getDataSourceConfigBuilder().build(),
@@ -227,17 +226,14 @@ public class MybatisPlusGenerationConfig {
                 null,
                 this.getGlobalConfigBuilder().build(),
                 this.getInjectionConfigBuilder(tableName).build());
-
         List<TableInfo> tableInfoList = configBuilder.getTableInfoList();
         TableInfo tableInfo = tableInfoList.get(0);
         Map<String, Object> objectMap = getObjectMap(configBuilder,tableInfo);
         VelocityContext context = new VelocityContext(objectMap);
         VelocityEngine velocityEngine = init(configBuilder);
         List<String> templatePathList = VelocityUtils.getTemplateList();
-
         // 创建模板文件返回给前端
         Map<String, String> map = new LinkedHashMap<>();
-
         for (String templatePath : templatePathList) {
             Template template = velocityEngine.getTemplate(templatePath, "UTF-8");
             String name = template.getName();
@@ -246,7 +242,6 @@ public class MybatisPlusGenerationConfig {
             String string = writer.toString();
             map.put(name, string);
         }
-
         return map;
     }
 

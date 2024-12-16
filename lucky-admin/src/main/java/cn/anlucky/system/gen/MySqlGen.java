@@ -1,7 +1,6 @@
 package cn.anlucky.system.gen;
 
 import cn.anlucky.system.base.controller.BaseController;
-import cn.anlucky.system.config.CodeConfig;
 import cn.anlucky.system.utils.PropertiesUtil;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;

@@ -133,41 +133,39 @@
         tableData: [],
         // 搜索条件
         searchForm: {
-      #foreach($field in ${table.fields})
-        #set($paramsName=${field.comment})
-        #set($columnProps=${field.propertyName})
-        #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
-          #if ($type=='String')
-              $columnProps: null, // $paramsName
-          #end
-        #end
-      #end
+#foreach($field in ${table.fields})
+#set($paramsName=${field.comment})
+#set($columnProps=${field.propertyName})
+#if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+#if ($type=='String')
+          $columnProps: null, // $paramsName
+#end
+#end
+#end
         },
         // 复选框选择的主键
         selectedIds: [],
         // 新增修改表单
         form: {
-          #foreach($field in ${table.fields})
-            #set($paramsName=${field.comment})
-            #set($columnProps=${field.propertyName})
-            ## 排除逻辑删除和自动填充字段和主键
-            #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
-            $columnProps: null, // $paramsName
-          #end
-          #end
+#foreach($field in ${table.fields})
+#set($paramsName=${field.comment})
+#set($columnProps=${field.propertyName})
+## 排除逻辑删除和自动填充字段和主键
+#if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+          $columnProps: null, // $paramsName
+#end
+#end
         },
         // 表单前端校验是否输入
         rules: {
-          #foreach($field in ${table.fields})
-            #set($paramsName=${field.comment})
-            #set($columnProps=${field.propertyName})
-            ## 排除逻辑删除和自动填充字段和主键
-            #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
-              $columnProps: [
-              { required: true, message: '请输入$paramsName', trigger: 'blur' }
-            ],
-            #end
-          #end
+#foreach($field in ${table.fields})
+#set($paramsName=${field.comment})
+#set($columnProps=${field.propertyName})
+## 排除逻辑删除和自动填充字段和主键
+#if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+          $columnProps: [{ required: true, message: '请输入$paramsName', trigger: 'blur' }],
+#end
+#end
         }
       }
     },
@@ -197,8 +195,8 @@
           this.total = data.total
           this.tableData = data.data
           this.tableLoading = false
-        }).catch(error => {
-          this.#[[$]]#message.error(error)
+        }).catch(() => {
+          // this.#[[$]]#message.error(error)
           this.tableLoading = false
           // console.log(error)
         })
@@ -224,31 +222,19 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // console.log(id)
           deleteByIds(id).then(() => {
-            this.#[[$]]#message({
-              type: 'success',
-              message: '删除成功!'
-            })
+            this.#[[$]]#message({type: 'success', message: '删除成功!'})
             this.handlePagination()
-          }).catch(error => {
-            this.#[[$]]#message.error(error)
-            // console.log(error)
+          }).catch(() => {
           })
         }).catch(() => {
-          this.#[[$]]#message({
-            type: 'info',
-            message: '已取消删除'
-          })
+          this.#[[$]]#message({type: 'info', message: '已取消删除'})
         })
       },
       // 批量删除按钮被点击
       handleBatchDelete() {
         if (this.selectedIds.length <= 0) {
-          this.#[[$]]#message({
-            type: 'warning',
-            message: '请选择要删除的数据'
-          })
+          this.#[[$]]#message({type: 'warning', message: '请选择要删除的数据'})
           return
         }
         this.#[[$]]#confirm('此操作将删除此条数据, 是否继续?', '提示', {
@@ -257,14 +243,10 @@
           type: 'warning'
         }).then(() => {
           deleteByIds(this.selectedIds).then(() => {
-            this.#[[$]]#message({
-              type: 'success',
-              message: '删除成功!'
-            })
+            this.#[[$]]#message({type: 'success', message: '删除成功!'})
             this.handlePagination()
-          }).catch(error => {
-            this.#[[$]]#message.error(error)
-            // console.log(error)
+          }).catch(() => {
+            this.#[[$]]#message({type: 'info', message: '已取消删除'})
           })
         })
       },
@@ -310,60 +292,48 @@
       // 重置表单
       resetForm() {
         const resetForm = {
-          #foreach($field in ${table.fields})
-        #set($paramsName=${field.comment})
-        #set($columnProps=${field.propertyName})
-      ## 排除逻辑删除和自动填充字段和主键
-        #if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
-        $columnProps: null, // $paramsName
-                #end
-        #end
+#foreach($field in ${table.fields})
+#set($paramsName=${field.comment})
+#set($columnProps=${field.propertyName})
+## 排除逻辑删除和自动填充字段和主键
+#if(!${field.keyFlag} &&!${field.logicDeleteField} && ${field.fill} != "INSERT_UPDATE" && ${field.fill} != "INSERT" && ${field.fill} != "UPDATE")
+          $columnProps: null, // $paramsName
+#end
+#end
       }
         this.form = resetForm
-        // console.log(this.form);
       },
       // 新增/修改表单提交
       submitForm() {
         this.#[[$]]#refs.form.validate((valid) => {
-        if (valid) {
-        if (this.dialogType === 'insert') {
-        // 新增
-        save(this.form).then(() => {
-        this.$message({
-        type: 'success',
-        message: '新增成功!'
-        })
-        this.handlePagination()
-        }).catch(error => {
-        this.$message.error(error)
-        // console.log(error)
-        })
-        } else if (this.dialogType === 'update') {
-        // 修改
-        updateSpecifyById(this.form).then(() => {
-        this.$message({
-        type: 'success',
-        message: '修改成功!'
-        })
-        this.handlePagination()
-        }).catch(error => {
-        this.$message.error(error)
-        // console.log(error)
-        })
-        } else {
-        this.$message.$error('请选择要操作的数据')
-        return false
-        }
-        this.dialogVisible = false
-        } else {
-        // console.log('表单验证失败');
-        }
+          if (valid) {
+            if (this.dialogType === 'insert') {
+              // 新增
+              save(this.form).then(() => {
+                this.$message({type: 'success', message: '新增成功!'})
+                this.handlePagination()
+              }).catch(() => {
+                // this.$message.error(error)
+              })
+            } else if (this.dialogType === 'update') {
+              // 修改
+              updateSpecifyById(this.form).then(() => {
+                this.$message({type: 'success', message: '修改成功!'})
+                this.handlePagination()
+              }).catch(() => {
+                // this.$message.error(error)
+              })
+            } else {
+              this.$message.$error('请选择要操作的数据')
+              return false
+            }
+            this.dialogVisible = false
+          }
         })
       }
     }
   }
 </script>
-
 <style scoped>
 
 </style>

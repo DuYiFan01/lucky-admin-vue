@@ -14,8 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-
-
     private static final String title = "Lucky-Admin-Vue-API";
     private static final String description = "Lucky-Admin-Vue-API 快速开发API文档，帮助您进行快速开发系统，快速了解整个项目API的调用以及调用某个API需要的参数";
 
@@ -24,7 +22,7 @@ public class SwaggerConfig {
     private static final String tokenName = "token";
 
     /**
-     * API分组
+     * API分组，可以自定义去分组
      */
     // @Bean
     // public GroupedOpenApi publicApi() {
@@ -33,7 +31,6 @@ public class SwaggerConfig {
     //             .pathsToMatch("/user/**") // 对应组的路径
     //             .build();
     // }
-
 
     @Bean
     public OpenAPI customOpenApi()
