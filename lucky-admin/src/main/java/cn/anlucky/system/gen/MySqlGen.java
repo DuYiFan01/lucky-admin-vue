@@ -1,6 +1,7 @@
 package cn.anlucky.system.gen;
 
 import cn.anlucky.system.base.controller.BaseController;
+import cn.anlucky.system.config.CodeConfig;
 import cn.anlucky.system.utils.PropertiesUtil;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
@@ -9,17 +10,18 @@ import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.builder.CustomFile;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
+
 import com.baomidou.mybatisplus.generator.fill.Column;
 import com.baomidou.mybatisplus.generator.keywords.MySqlKeyWordsHandler;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
- * 代码生成器入口，会有一些少许BUG，后续会慢慢优化
+ * 代码生成器
+ *         MySQLGenerationCode  -- 没有经过测试的代码生成器
+ *         MySqlGen             -- 经过测试的代码生成器
  */
-public class MySqlGen extends BaseController {
+public class MySqlGen{
     public static void main(String[] args) throws Exception {
 
         Properties properties = PropertiesUtil.getProperties("CodeGeneration.properties");
@@ -68,7 +70,6 @@ public class MySqlGen extends BaseController {
                                     .enableCapitalMode() // 开启大写命名
                                     .enableSkipView() // 开启跳过视图
                                     .disableSqlFilter() // 禁用 SQL 过滤
-
                                     .entityBuilder()
                                     .logicDeleteColumnName(deleteFlagField)
                                     .enableFileOverride()
@@ -85,7 +86,6 @@ public class MySqlGen extends BaseController {
                                     .logicDeleteColumnName("del_flag")
                                     .formatFileName("%s")
                                     .javaTemplate("/templates/java/entity.java")
-
                                     // .disable() // 禁用实体类生成
                                     .serviceBuilder()
                                     .enableFileOverride()
@@ -114,7 +114,6 @@ public class MySqlGen extends BaseController {
                                     .template("/templates/java/controller.java")
                                     .build())
                     .injectionConfig(consumer -> {
-                        Map<String, String> customFile = new HashMap<>();
                         consumer.customFile(
                                 new CustomFile.Builder()
                                         .fileName("/index.vue")

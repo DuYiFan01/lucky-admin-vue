@@ -48,6 +48,14 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'dashboard' }
     },
     {
+      path: 'profile',
+      name: '个人中心',
+      hidden: true,
+      component: () => import('@/views/profile/index'),
+      meta: { title: '个人中心', icon: 'dashboard' }
+    },
+
+    {
       path: '/403',
       name: '403',
       component: () => import('@/views/403'),
@@ -60,8 +68,7 @@ export const constantRoutes = [
       hidden: true
     }
     ]
-  }
-
+  },
 ]
 export const asyncRoutes = [
   // {

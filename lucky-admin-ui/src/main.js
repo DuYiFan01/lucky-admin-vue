@@ -15,7 +15,7 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
-import permission from './directive/permission'
+import permission from './directive'
 import { handleTree, checkPermission } from './utils/lucky'
 
 /**
