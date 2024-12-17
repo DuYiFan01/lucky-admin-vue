@@ -1,6 +1,7 @@
 package cn.anlucky.system.gen;
 
 import cn.anlucky.system.base.controller.BaseController;
+import cn.anlucky.system.exception.CustomException;
 import cn.anlucky.system.utils.VelocityUtils;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -15,12 +16,18 @@ import com.baomidou.mybatisplus.generator.engine.AbstractTemplateEngine;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import com.baomidou.mybatisplus.generator.keywords.MySqlKeyWordsHandler;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * MybatisPlus代码生成配置
@@ -185,8 +192,7 @@ public class MybatisPlusGenerationConfig {
      * @param tableName
      * @return
      */
-    public ConfigBuilder getConfigBuilder(String tableName)
-    {
+    public ConfigBuilder getConfigBuilder(String tableName) {
         ConfigBuilder configBuilder = new ConfigBuilder(
                 this.getPackageConfigBuilder().build(),
                 this.getDataSourceConfigBuilder().build(),
@@ -244,6 +250,130 @@ public class MybatisPlusGenerationConfig {
         }
         return map;
     }
+
+    public static void main(String[] args)  throws Exception{
+        MybatisPlusGenerationConfig generationConfig = new MybatisPlusGenerationConfig();
+        // generationConfig.previewCode("users");
+        generationConfig.generationCode("users",null);
+    }
+
+    public byte[] downloadCode(String tableName) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(outputStream);
+        generationCode(tableName, zip);
+        IOUtils.closeQuietly(zip);
+        return outputStream.toByteArray();
+    }
+
+    public void generationCode(String tableName, ZipOutputStream zip) {
+        // 获取配置
+        ConfigBuilder configBuilder = new ConfigBuilder(
+                this.getPackageConfigBuilder().build(),
+                this.getDataSourceConfigBuilder().build(),
+                this.getStrategyConfigBuilder(tableName),
+                null,
+                this.getGlobalConfigBuilder().build(),
+                this.getInjectionConfigBuilder(tableName).build());
+        String packagePath = configBuilder.getPackageConfig().getParent().replace(".", "/") + "/";
+        String moduleName = configBuilder.getPackageConfig().getModuleName();
+        List<TableInfo> tableInfoList = configBuilder.getTableInfoList();
+        TableInfo tableInfo = tableInfoList.get(0);
+        String templateEndType = ".vm"; // 模板引擎模板结尾
+        // 实体
+        String entityName = tableInfo.getEntityName();
+        String entityPath = configBuilder.getPackageConfig().getEntity().replace(".","/");
+        String entityTemplatePath = configBuilder.getStrategyConfig().entity().getJavaTemplate() + templateEndType;
+        // Mapper
+        String mapperName = tableInfo.getMapperName();
+        String mapperPath = configBuilder.getPackageConfig().getMapper().replace(".","/");;
+        String mapperTemplatePath = configBuilder.getStrategyConfig().mapper().getMapperTemplatePath() + templateEndType;
+        // Mapper XML
+        String xmlName = tableInfo.getXmlName();
+        String xmlPath = configBuilder.getPackageConfig().getXml().replace(".","/");;
+        String xmlTemplatePath = configBuilder.getStrategyConfig().mapper().getMapperXmlTemplatePath() + templateEndType;
+        // Service
+        String serviceName = tableInfo.getServiceName();
+        String servicePath =configBuilder.getPackageConfig().getService().replace(".","/");;
+        String serviceTemplatePath = configBuilder.getStrategyConfig().service().getServiceTemplate() + templateEndType;
+        // Service Impl
+        String serviceImplName = tableInfo.getServiceImplName();
+        String serviceImplPath = configBuilder.getPackageConfig().getServiceImpl().replace(".","/");;
+        String serviceImplTemplatePath = configBuilder.getStrategyConfig().service().getServiceImplTemplate() + templateEndType;
+        // controller
+        String controllerName = tableInfo.getControllerName();
+        String controllerPath = configBuilder.getPackageConfig().getController().replace(".","/");;
+        String controllerTemplatePath = configBuilder.getStrategyConfig().controller().getTemplatePath() + templateEndType;
+
+        // 自定义模板
+        List<CustomFile> customFiles = configBuilder.getInjectionConfig().getCustomFiles();
+
+
+        Map<String, Object> objectMap = getObjectMap(configBuilder,tableInfo);
+        VelocityContext context = new VelocityContext(objectMap);
+        VelocityEngine velocityEngine = init(configBuilder);
+
+
+        // 添加到zip
+        try {
+            Template template = velocityEngine.getTemplate(entityTemplatePath, "UTF-8");
+            StringWriter writer = new StringWriter();
+            template.merge(context, writer);
+            zip.putNextEntry(new ZipEntry(packagePath + entityPath+ "/"+ entityName + ".java"));
+            IOUtils.write(writer.toString(), zip);
+
+            template = velocityEngine.getTemplate(mapperTemplatePath, "UTF-8");
+            writer = new StringWriter();
+            template.merge(context, writer);
+            zip.putNextEntry(new ZipEntry(packagePath + mapperPath+ "/"+ mapperName + ".java"));
+            IOUtils.write(writer.toString(), zip);
+
+            template = velocityEngine.getTemplate(xmlTemplatePath, "UTF-8");
+            writer = new StringWriter();
+            template.merge(context, writer);
+            zip.putNextEntry(new ZipEntry(packagePath + xmlPath+ "/"+ xmlName + ".xml"));
+            IOUtils.write(writer.toString(), zip);
+
+            template = velocityEngine.getTemplate(serviceTemplatePath, "UTF-8");
+            writer = new StringWriter();
+            template.merge(context, writer);
+            zip.putNextEntry(new ZipEntry(packagePath + servicePath+ "/"+ serviceName + ".java"));
+            IOUtils.write(writer.toString(), zip);
+
+            template = velocityEngine.getTemplate(serviceImplTemplatePath, "UTF-8");
+            writer = new StringWriter();
+            template.merge(context, writer);
+            zip.putNextEntry(new ZipEntry(packagePath + serviceImplPath+ "/"+ serviceImplName + ".java"));
+            IOUtils.write(writer.toString(), zip);
+
+
+            template = velocityEngine.getTemplate(controllerTemplatePath, "UTF-8");
+            writer = new StringWriter();
+            template.merge(context, writer);
+            zip.putNextEntry(new ZipEntry(packagePath + controllerPath+ "/"+ controllerName + ".java"));
+            IOUtils.write(writer.toString(), zip);
+
+            // 自定义文件
+            for (int i = 0; i < customFiles.size(); i++) {
+                CustomFile customFile = customFiles.get(i);
+                template = velocityEngine.getTemplate(customFile.getTemplatePath(), "UTF-8");
+                writer = new StringWriter();
+                template.merge(context, writer);
+                zip.putNextEntry(new ZipEntry(customFile.getPackageName() +"/" + customFile.getFileName()));
+                IOUtils.write(writer.toString(), zip);
+            }
+
+            IOUtils.closeQuietly(writer);
+            zip.flush();
+            zip.closeEntry();
+        } catch (Exception e) {
+            throw new CustomException(e.getMessage());
+        }
+
+    }
+
+
+
+
 
     private @NotNull Map<String, Object> getObjectMap(@NotNull ConfigBuilder config, @NotNull TableInfo tableInfo) {
         StrategyConfig strategyConfig = config.getStrategyConfig();

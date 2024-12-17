@@ -44,7 +44,7 @@
                     <el-button v-permission="['tools::gen::list']" :size="toolBar.size" :type="toolBar.updateType"
                         icon="el-icon-view" @click="handlePreview(scope.row)">预览代码</el-button>
                     <el-button v-permission="['tools::gen::list']" :size="toolBar.size" :type="toolBar.updateType"
-                        icon="el-icon-download" @click="handleAssRole(scope.row)">下载代码</el-button>
+                        icon="el-icon-download" @click="handleDownloadCode(scope.row)">下载代码</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -57,13 +57,13 @@
         <!-- 预览界面 -->
         <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body
             >
-            <el-tabs v-model="preview.activeName" class="scrollbar">
-                <el-tab-pane v-for="(value, key) in preview.data"
+            <el-tabs v-model="preview.activeName">
+                <el-tab-pane v-for="(value, key) in preview.data" 
                     :label="key.substring(key.lastIndexOf('/') + 1, key.indexOf('.vm'))"
                     :name="key.substring(key.lastIndexOf('/') + 1, key.indexOf('.vm'))" :key="key">
                     <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="value"
                         v-clipboard:success="clipboardSuccess" style="float:right">复制</el-link>
-                    <pre><code class="hljs" v-html="highlightedCode(value, key)"></code></pre>
+                    <pre class="scrollbar"><code class="hljs" v-html="highlightedCode(value, key)"></code></pre>
                 </el-tab-pane>
             </el-tabs>
         </el-dialog>
@@ -129,6 +129,9 @@ export default {
         this.getTableData({}, this.currentPage, this.pageSize)
     },
     methods: {
+        handleDownloadCode(row){
+            window.open(process.env.VUE_APP_BASE_API + '/tools/gen/downloadCode/' + row.name)
+        },
         /** 复制代码成功 */
         clipboardSuccess() {
             this.$message.success("复制成功");
@@ -144,7 +147,7 @@ export default {
         handlePreview(row) {
             console.log("row", row);
             this.preview.title = row.name + "表生成代码预览"
-            this.preview.activeName = 'controller.java'
+            this.preview.activeName = 'entity.java'
             this.preview.open = true
             this.getPreviewData(row.name)
         },

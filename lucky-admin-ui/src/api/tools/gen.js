@@ -18,3 +18,11 @@ export function previewCode(tableName) {
       method: 'get'
     })
   }
+
+// 下载代码
+export function downloadCode(tableName) {
+    return request({
+      url: apiPath + '/downloadCode/' + tableName,
+      method: 'get'
+    })
+  }

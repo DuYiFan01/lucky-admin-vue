@@ -52,5 +52,19 @@ public class TablePoServiceImpl implements TablePoService {
         return config.previewCode(tableName);
     }
 
+    /**
+     * @param tableName
+     * @return
+     */
+    @Override
+    public byte[] downloadCode(String tableName) {
+        MybatisPlusGenerationConfig config = new MybatisPlusGenerationConfig();
+        try {
+            return config.downloadCode(tableName);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

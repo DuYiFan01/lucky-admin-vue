@@ -21,6 +21,9 @@ public interface TablePoService {
     public Map<String, String> previewCode(String tableName);
 
 
+    public byte[] downloadCode(String tableName);
+
+
 
 
 }
