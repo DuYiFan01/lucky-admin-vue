@@ -2,8 +2,6 @@ package cn.anlucky.system.pojo.monitor.server;
 
 /**
  * 系统相关信息
- *
- * @author ruoyi
  */
 public class Sys
 {

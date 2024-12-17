@@ -3,7 +3,6 @@ package cn.anlucky.system.enums;
 /**
  * 操作人类别
  *
- * @author ruoyi
  */
 public enum OperatorType
 {

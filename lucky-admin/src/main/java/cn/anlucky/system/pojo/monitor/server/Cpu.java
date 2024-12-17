@@ -6,7 +6,6 @@ import cn.anlucky.system.utils.Arith;
 /**
  * CPU相关信息
  *
- * @author ruoyi
  */
 public class Cpu
 {

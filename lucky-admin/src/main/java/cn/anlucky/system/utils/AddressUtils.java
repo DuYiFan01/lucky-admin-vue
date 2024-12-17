@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 /**
  * 获取地址类
  *
- * @author ruoyi
  */
 public class AddressUtils
 {

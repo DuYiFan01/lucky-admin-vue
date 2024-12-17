@@ -13,9 +13,6 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsFilterConfig {
 
-    @Value("${server.servlet.context-path}")
-    private String path;
-
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();

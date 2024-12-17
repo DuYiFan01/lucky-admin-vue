@@ -4,11 +4,11 @@ package cn.anlucky.vo;
 import cn.anlucky.system.enums.Code;
 import lombok.Data;
 
-@Data
 /**
  * R类用于封装API请求的响应结果
  * 它提供了一系列静态方法来创建响应对象，包括成功和错误情况
  */
+@Data
 public class R<T> {
     // HTTP状态码
     private String code;

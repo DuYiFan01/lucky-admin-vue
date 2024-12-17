@@ -1,13 +1,7 @@
 package cn.anlucky.system.utils;
 
-import cn.anlucky.system.gen.CodeGenerationConfig;
-import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
-import com.baomidou.mybatisplus.generator.config.builder.CustomFile;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class VelocityUtils {
 

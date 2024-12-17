@@ -2,8 +2,6 @@ package cn.anlucky.system.utils;
 
 /**
  * 字符串格式化
- *
- * @author sx
  */
 public class StrFormatter {
     public static final String EMPTY_JSON = "{}";
