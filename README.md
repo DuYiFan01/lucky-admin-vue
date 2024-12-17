@@ -3,6 +3,7 @@
 #### 介绍
 Lucky-Admin-Vue 一个基于vue-admin-template的后台管理框架，集成了动态角色权限，动态路由，日志管理，Sa-Token权限校验，快速构建一个管理后台的框架
 #### 软件架构
+在线地址预览：[https://lucky-admin.cn](http://admin.anlucky.cn/)
 ##### 开发环境
 ###### 后端
 - JDK 1.8+
