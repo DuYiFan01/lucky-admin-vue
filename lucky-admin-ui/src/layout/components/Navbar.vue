@@ -14,8 +14,11 @@
           <router-link to="/">
             <el-dropdown-item divided style="text-align: center;">首页</el-dropdown-item>
           </router-link>
+          <router-link to="/profile">
+            <el-dropdown-item divided style="text-align: center;">个人中心</el-dropdown-item>
+          </router-link>
           <a v-for="item in links" :key="item.title" :href="item.url" :target="item.target">
-            <el-dropdown-item>{{ item.title }}</el-dropdown-item>
+            <el-dropdown-item style="text-align: center;">{{ item.title }}</el-dropdown-item>
           </a>
           <el-dropdown-item divided @click.native="updatePassword.updatePasswordDialog = true">
             <span style="display:block;">修改密码</span>
@@ -94,7 +97,7 @@ export default {
       avatar: process.env.VUE_APP_BASE_URL + process.env.VUE_APP_BASE_API + '/user/' + this.$store.getters.username + '/square',
       // 链接
       links: [
-        { title: '在线编辑', url: 'https://panjiachen.github.io/vue-element-admin-site/#/', target: '_blank' },
+        { title: 'Gitee', url: 'https://gitee.com/xiaodu6/lucky-admin-vue', target: '_blank' },
         { title: '下载模板', url: 'https://github.com/PanJiaChen/vue-element-admin/archive/master.zip', target: '_blank' }
       ]
     }

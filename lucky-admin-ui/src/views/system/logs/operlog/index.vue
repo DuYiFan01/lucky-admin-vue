@@ -99,6 +99,7 @@
           <el-tag v-if="scope.row.businessType === 1">新增</el-tag>
           <el-tag v-if="scope.row.businessType === 2" type="warning">修改</el-tag>
           <el-tag v-if="scope.row.businessType === 3" type="danger">删除</el-tag>
+          <el-tag v-if="scope.row.businessType === 8">代码生成</el-tag>
           <el-tag v-if="scope.row.businessType === 0" type="info">其他</el-tag>
         </template>
       </el-table-column>
