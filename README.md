@@ -6,7 +6,7 @@ Lucky-Admin-Vue 一个基于vue-admin-template的后台管理框架，集成了�
 在线地址预览：[Lucky-Admin-Vue](http://admin.anlucky.cn/)
 ##### 开发环境
 ###### 后端
-- JDK 1.8+
+- JDK 17+
 - SpringBoot 3
 - MySQL 5.7+ 
 - Maven 3.6+

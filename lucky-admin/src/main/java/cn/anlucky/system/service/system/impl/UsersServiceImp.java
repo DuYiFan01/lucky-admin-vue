@@ -25,10 +25,6 @@ import java.util.Objects;
 @Service
 public class UsersServiceImp extends ServiceImpl<UsersMapper, Users> implements UsersService {
 
-    @Autowired
-    private UserRolesService userRolesService;
-
-
     /**
      * 分页带条件查询Users
      * @param users

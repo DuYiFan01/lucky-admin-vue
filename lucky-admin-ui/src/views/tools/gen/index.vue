@@ -101,6 +101,7 @@
       append-to-body
     >
       <el-tabs v-model="preview.activeName">
+        <p style="color: red;">后端代码请您手动修改包路径</p>
         <el-tab-pane
           v-for="(value, key) in preview.data"
           :key="key"
