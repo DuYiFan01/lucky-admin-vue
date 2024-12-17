@@ -68,7 +68,7 @@ export const constantRoutes = [
       hidden: true
     }
     ]
-  },
+  }
 ]
 export const asyncRoutes = [
   // {
