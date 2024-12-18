@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/lucky_admin?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: lucky_admin
-    password: faRpBAxkKnZhfJBT
+    password: ZPrepCkNS2C5XyTr
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       db-type: mysql
