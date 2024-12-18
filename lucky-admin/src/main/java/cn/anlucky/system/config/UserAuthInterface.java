@@ -2,29 +2,37 @@ package cn.anlucky.system.config;
 
 
 import cn.anlucky.system.mapper.UsersMapper;
+import cn.anlucky.system.pojo.system.Roles;
+import cn.anlucky.system.service.system.LoginService;
+import cn.anlucky.system.service.system.UsersService;
 import cn.dev33.satoken.stp.StpInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
 public class UserAuthInterface implements StpInterface {
 
-    private final UsersMapper usersMapper;
+    private final LoginService loginService;
 
-    // todo:https://sa-token.cc/doc.html#/fun/jur-cache
-    // todo:权限放入redis中读取
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        List<String> permissionList = usersMapper.getPermissionList(loginId.toString());
+
+        List<Roles> roleList = loginService.getRolesByLoginId(loginId.toString());
+        ArrayList<String> permissionList = new ArrayList<>();
+        roleList.stream().forEach(role -> {
+            List<String> permissions = loginService.getPermissionsByRoleId(role.getId());
+            permissionList.addAll(permissions);
+        });
         return permissionList;
     }
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        List<String> roleList = usersMapper.getRoleList(loginId.toString());
-        return roleList;
+        List<Roles> roleList = loginService.getRolesByLoginId(loginId.toString());
+        return roleList.stream().map(Roles::getName).toList();
     }
 }

@@ -11,6 +11,7 @@ import cn.anlucky.system.service.system.RolesService;
 import cn.anlucky.system.service.system.UserRolesService;
 import cn.anlucky.system.service.system.UsersService;
 import cn.anlucky.system.vo.*;
+import cn.anlucky.utils.SaTokenDaoUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -103,8 +104,12 @@ public class RolesServiceImp extends ServiceImpl<RolesMapper, Roles> implements 
             rolesMenus.setMenuId(roles.getMenus().get(i));
             list.add(rolesMenus);
         }
-        boolean b = rolesMenusService.saveBatch(list);
-        return this.updateById(roles);
+
+        rolesMenusService.saveBatch(list);
+        this.updateById(roles);
+        // 删除当前角色缓存的权限
+        SaTokenDaoUtils.deleteObjectKey(SaTokenDaoUtils.PERMISSIONS_CACHE + roles.getId());
+        return true;
     }
 
     /**
@@ -183,6 +188,8 @@ public class RolesServiceImp extends ServiceImpl<RolesMapper, Roles> implements 
             rolesMenusService.remove(roleMenusWrapper);
             // 删除角色
             this.removeById(ids.get(i));
+            // 删除当前角色的权限缓存
+            SaTokenDaoUtils.deleteObjectKey(SaTokenDaoUtils.PERMISSIONS_CACHE + ids.get(i));
         }
     }
 
@@ -268,8 +275,12 @@ public class RolesServiceImp extends ServiceImpl<RolesMapper, Roles> implements 
             list.add(userRoles);
         }
         boolean b = userRolesService.saveBatch(list);
+        // todo: 搜索当前角色缓存的用户，并将其全部失效，避免缓存数据不一致 同一时间内失效大量缓存可能会导致缓存雪崩
+        List<String> rolesCache = SaTokenDaoUtils.searchData(SaTokenDaoUtils.ROLES_CACHE, 0L, usersService.count());
+        rolesCache.forEach(roleCache -> {
+            SaTokenDaoUtils.deleteObjectKey(roleCache);
+        });
     }
-
     /**
      * 为用户分配角色
      *
@@ -298,5 +309,7 @@ public class RolesServiceImp extends ServiceImpl<RolesMapper, Roles> implements 
             list.add(userRoles);
         }
         boolean b = userRolesService.saveBatch(list);
+        // 将当前用户的缓存失效
+        SaTokenDaoUtils.deleteObjectKey(SaTokenDaoUtils.ROLES_CACHE + saveGrantUserVo.getUserId());
     }
 }

@@ -23,19 +23,22 @@
         SELECT
             m.roles
         FROM
-            user_roles ur
-                INNER JOIN
-            roles_menus rm ON rm.role_id = ur.role_id
-                INNER JOIN
-            menus m ON m.id = rm.menu_id
-                AND m.menu_type = 'F'
+            menus m
+        INNER JOIN roles_menus rm ON rm.menu_id = m.id
         WHERE
-            ur.user_id = #{loginId}
+            m.menu_type = 'F'
+        AND rm.role_id = #{roleId}
     </select>
 
-    <select id="getRoleList" resultType="java.lang.String">
+    <select id="getRoleList" resultType="cn.anlucky.system.pojo.system.Roles">
         select
-            r.name
+            r.id,
+            r.name,
+            r.description,
+            r.create_time,
+            r.create_by,
+            r.update_time,
+            r.update_by
         from
             roles r
                 inner join

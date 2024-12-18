@@ -1,5 +1,6 @@
 package cn.anlucky.system.service.system;
 
+import cn.anlucky.system.pojo.system.Roles;
 import cn.anlucky.system.pojo.system.Users;
 import cn.anlucky.system.vo.LoginVo;
 import cn.anlucky.system.vo.UserInfoVo;
@@ -45,7 +46,14 @@ public interface LoginService {
      * @param loginId
      * @return
      */
-    public List<String> getUserRoleList(String loginId);
+    public List<Roles> getRolesByLoginId(String loginId);
+
+    /**
+     * 根据角色id获取权限列表
+     * @param roleId
+     * @return
+     */
+    public List<String> getPermissionsByRoleId(Long roleId);
 
 
 }

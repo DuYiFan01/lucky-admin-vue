@@ -13,7 +13,7 @@ spring:
       db-type: mysql
   data:
     redis:
-      database: 0
+      database: 1
       host: localhost
       port: 6379
       password:

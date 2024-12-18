@@ -3,6 +3,7 @@ package cn.anlucky.system.service.system.impl;
 import cn.anlucky.system.exception.CustomException;
 import cn.anlucky.system.mapper.UsersMapper;
 import cn.anlucky.system.pojo.system.LoginLog;
+import cn.anlucky.system.pojo.system.Roles;
 import cn.anlucky.system.pojo.system.Users;
 import cn.anlucky.system.service.system.LoginLogService;
 import cn.anlucky.system.service.system.LoginService;
@@ -14,17 +15,21 @@ import cn.anlucky.system.utils.ServletUtils;
 import cn.anlucky.system.vo.LoginVo;
 import cn.anlucky.system.vo.RouterVo;
 import cn.anlucky.system.vo.UserInfoVo;
+import cn.anlucky.utils.SaTokenDaoUtils;
 import cn.dev33.satoken.stp.SaLoginModel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements LoginService {
@@ -121,30 +126,24 @@ public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      */
     @Override
     public UserInfoVo getUserInfo(String loginId) {
-
         if (loginId == null){
             throw new CustomException("用户id不能为空");
         }
-
         UserInfoVo userInfoVo = new UserInfoVo();
-        // 设置当前用户的按钮权限
-        List<String> userPermissionList = this.baseMapper.getPermissionList(loginId);
-        userInfoVo.setPermissions(userPermissionList);
         // 设置当前用户的角色列表
-        List<String> roleList = this.baseMapper.getRoleList(loginId);
-        userInfoVo.setRoles(roleList);
-
-        List<String> userRoleList = this.getUserRoleList(loginId);
-        userInfoVo.setRoles(userRoleList);
-
+        List<Roles> userRoleList = this.getRolesByLoginId(loginId);
+        userInfoVo.setRoles(userRoleList.stream().map(Roles::getName).toList());
+        // 设置当前用户的按钮权限
+        ArrayList<String> userPermissionList = new ArrayList<>();
+        userRoleList.stream().forEach(role -> {
+            List<String> permissions = this.getPermissionsByRoleId(role.getId());
+            userPermissionList.addAll(permissions);
+        });
+        userInfoVo.setPermissions(userPermissionList);
         userInfoVo.setId(loginId);
-
-        Users users = this.getById(loginId);
-        userInfoVo.setUsername(users.getUsername());
-
+        userInfoVo.setUsername(Sa.getLoginUserName());
         List<RouterVo> routerTree = menusServiceImpl.getRouterTree();
         userInfoVo.setRouters(routerTree);
-
         return userInfoVo;
     }
 
@@ -177,21 +176,42 @@ public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     /**
-     * 根据用户id获取用户角色列表
+     * 根据用户id获取用户角色名称列表
      *
      * @param loginId
      * @return
      */
     @Override
-    public List<String> getUserRoleList(String loginId) {
+    public List<Roles> getRolesByLoginId(String loginId) {
         if (loginId == null){
             throw new CustomException("用户id不能为空");
         }
-
-        return this.baseMapper.getRoleList(loginId);
+        List<Roles> roleList = (List<Roles>) SaTokenDaoUtils.getObjectKey(SaTokenDaoUtils.ROLES_CACHE + loginId);
+        if (roleList == null){
+            roleList = this.baseMapper.getRoleList(loginId);
+            SaTokenDaoUtils.setObjectKey(SaTokenDaoUtils.ROLES_CACHE + loginId, roleList, SaTokenDaoUtils.DAY_TIMEOUT);
+        }
+        return roleList;
     }
 
-
+    /**
+     * 根据角色id获取权限列表
+     *
+     * @param roleId
+     * @return
+     */
+    @Override
+    public List<String> getPermissionsByRoleId(Long roleId) {
+        if (roleId == null){
+            throw new CustomException("角色id不能为空");
+        }
+        List<String> permissionList = (List<String>) SaTokenDaoUtils.getObjectKey(SaTokenDaoUtils.PERMISSIONS_CACHE + roleId);
+        if (permissionList == null){
+            permissionList = this.baseMapper.getPermissionList(roleId);
+            SaTokenDaoUtils.setObjectKey(SaTokenDaoUtils.PERMISSIONS_CACHE + roleId, permissionList, SaTokenDaoUtils.DAY_TIMEOUT);
+        }
+        return permissionList;
+    }
 
 
 }
