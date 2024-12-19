@@ -1,129 +1,135 @@
 package cn.anlucky.system.gen;
 
-import cn.anlucky.system.exception.CustomException;
-import cn.anlucky.system.utils.PropertiesUtil;
-import java.util.Properties;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /*
  * 代码生成配置类
  * 该类用于配置代码生成过程中的各种参数，如数据库连接信息、包名设置以及输出目录等
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CodeGenerationConfig {
-    private static Properties properties;
-    public CodeGenerationConfig() {
-        properties = PropertiesUtil.getProperties("CodeGeneration.properties");
-        if (properties == null){
-            throw new CustomException("配置文件CodeGeneration.properties未找到");
+
+    private static CodeGenerationConfig codeGenerationConfig;
+
+    public static CodeGenerationConfig create() {
+        if (codeGenerationConfig == null) {
+            codeGenerationConfig = new CodeGenerationConfig();
+            codeGenerationConfig.setAuthor("yifan.du");
+            codeGenerationConfig.setOutputDir("D:/Desktop/luckyGenerator/2");
+            codeGenerationConfig.setPackageName("cn.anlucky");
+            codeGenerationConfig.setMouldName("system");
+            codeGenerationConfig.setCreateTimeField("create_time");
+            codeGenerationConfig.setUpdateTimeField("update_time");
+            codeGenerationConfig.setCreateByField("create_by");
+            codeGenerationConfig.setUpdateByField("update_by");
+            codeGenerationConfig.setDeleteFlagField("del_flag");
+            codeGenerationConfig.setEntityPackage("pojo");
+            codeGenerationConfig.setMapperPackage("mapper");
+            codeGenerationConfig.setMapperXmlPackage("mapper.xml");
+            codeGenerationConfig.setServicePackage("service");
+            codeGenerationConfig.setServiceImplPackage("service.impl");
+            codeGenerationConfig.setControllerPackage("controller");
+            codeGenerationConfig.setEntityTemplatePath("/templates/java/entity.java");
+            codeGenerationConfig.setMapperTemplatePath("/templates/java/mapper.java");
+            codeGenerationConfig.setMapperXmlTemplatePath("/templates/xml/mapper.xml");
+            codeGenerationConfig.setServiceTemplatePath("/templates/java/service.java");
+            codeGenerationConfig.setServiceImplTemplatePath("/templates/java/serviceImpl.java");
+            codeGenerationConfig.setControllerTemplatePath("/templates/java/controller.java");
         }
-    }
-    /**
-     * 获取作者
-     * @return 作者信息
-     */
-    public String getAuthor() {
-        return getPropertyValue("author");
+        return codeGenerationConfig;
     }
 
-    /**
-     * 获取数据库URL
-     * @return 数据库URL地址
-     */
-    public String getDbUrl() {
-        return getPropertyValue("mysql_db_url");
-    }
 
     /**
-     * 获取数据库用户名
-     * @return 数据库用户名
+     * 作者
      */
-    public String getDbUserName() {
-        return getPropertyValue("mysql_db_username");
-    }
+    private String author;
+    /**
+     * 输出目录
+     */
+    private String outputDir;
+    /**
+     * 包名
+     */
+    private String packageName;
+    /**
+     * 模板名称
+     */
+    private String mouldName;
+    /**
+     * 自动填充创建时间字段名称
+     */
+    private String createTimeField;
+    /**
+     * 自动填充修改时间字段名称
+     */
+    private String updateTimeField;
+    /**
+     * 自动填充创建人字段名称
+     */
+    private String createByField;
+    /**
+     * 自动填充修改人字段名称
+     */
+    private String updateByField;
+    /**
+     * 逻辑删除字段名称
+     */
+    private String deleteFlagField;
 
     /**
-     * 获取数据库密码
-     * @return 数据库密码
+     * 实体类所在包名
      */
-    public String getDbPassword() {
-        return getPropertyValue("mysql_db_password");
-    }
-
+    private String entityPackage;
     /**
-     * 获取表名
-     * @return 数据库表名
+     * mapper接口所在包名
      */
-    public String getTableName() {
-        return getPropertyValue("table_names");
-    }
-
+    private String mapperPackage;
     /**
-     * 获取包名
-     * @return Java包名
+     * mapper.xml文件所在包名
      */
-    public String getPackageName() {
-        return getPropertyValue("package_name");
-    }
-
+    private String mapperXmlPackage;
     /**
-     * 获取包路径
-     * @return Java包路径
+     * service所在包名
      */
-    public String getPackagePath() {
-        return getPropertyValue("package_path");
-    }
-
+    private String servicePackage;
     /**
-     * 获取输出目录
-     * @return 输出目录路径
+     * service实现类所在包名
      */
-    public String getOutputDirectory() {
-        return getPropertyValue("output_directory");
-    }
-
+    private String serviceImplPackage;
     /**
-     * 获取创建时间字段
-     * @return 创建时间字段名
+     * controller所在包名
      */
-    public String getCreateTimeField() {
-        return getPropertyValue("create_time_field");
-    }
-
+    private String controllerPackage;
     /**
-     * 获取更新时间字段
-     * @return 更新时间字段名
+     * 实体模板路径
      */
-    public String getUpdateTimeField() {
-        return getPropertyValue("update_time_field");
-    }
-
+    private String entityTemplatePath;
     /**
-     * 获取创建者字段
-     * @return 创建者字段名
+     * mapper模板路径
      */
-    public String getCreateByField() {
-        return getPropertyValue("create_by_field");
-    }
-
+    private String mapperTemplatePath;
     /**
-     * 获取更新者字段
-     * @return 更新者字段名
+     * mapper.xml模板路径
      */
-    public String getUpdateByField() {
-        return getPropertyValue("update_by_field");
-    }
-
+    private String mapperXmlTemplatePath;
     /**
-     * 获取删除标志字段
-     * @return 删除标志字段名
+     * service模板路径
      */
-    public String getDeleteFlagField() {
-        return getPropertyValue("delete_flag_field");
-    }
+    private String serviceTemplatePath;
+    /**
+     * serviceImpl模板路径
+     */
+    private String serviceImplTemplatePath;
+    /**
+     * controller模板路径
+     */
+    private String controllerTemplatePath;
 
-    private static String getPropertyValue(String key) {
-        Object value = properties.get(key);
-        return value != null ? value.toString() : "";
-    }
 
 }
 

@@ -83,7 +83,7 @@
         <el-form-item label="角色描述" prop="description">
           <el-input v-model="form.description" autocomplete="off" />
         </el-form-item>
-        <el-form-item v-show="menuShow" label="分配权限" prop="menus">
+        <el-form-item v-if="menuShow" label="分配权限" prop="menus">
           <el-input v-model="filterText" placeholder="请输入权限名称" />
           <el-button size="mini" type="primary" @click="handleCheckAll">全选/全不选</el-button>
           <el-button size="mini" type="primary" @click="handleExpand(form.menus)">展开/折叠</el-button>
@@ -296,6 +296,9 @@ export default {
       this.menuShow = false
       this.$nextTick(() => {
         this.menuShow = true
+        this.$nextTick(() => {
+          this.handleResetRole(row)
+        })
       })
     },
     // 重置选中的菜单项目，恢复到此次修改之前

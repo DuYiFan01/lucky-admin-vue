@@ -30,6 +30,10 @@ public class SaTokenDaoUtils {
      * 路由缓存
      */
     public static final String ROUTER_CACHE = "router:";
+    /**
+     * 代码生成包信息缓存
+     */
+    public static final String GENERATION_PACKAGE_CACHE = "generation:";
 
     /**
      * 一天缓存时间

@@ -22,22 +22,28 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/**
- * MybatisPlus代码生成配置
- */
+@Component
 public class MybatisPlusGenerationConfig {
-    private static CodeGenerationConfig config;
 
-    public MybatisPlusGenerationConfig() {
-        config = new CodeGenerationConfig();
-    }
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
+    @Value("${spring.datasource.username}")
+    private String dbUserName;
+
+    @Value("${spring.datasource.password}")
+    private String dbPassword;
+    public static CodeGenerationConfig generationConfig = CodeGenerationConfig.create();
+
 
     /**
      * 获取数据源配置
@@ -45,10 +51,7 @@ public class MybatisPlusGenerationConfig {
      * @return
      */
     private DataSourceConfig.Builder getDataSourceConfigBuilder() {
-        String dbUrl = config.getDbUrl();
-        String dbUserName = config.getDbUserName();
-        String dbPassword = config.getDbPassword();
-        return new DataSourceConfig.Builder(dbUrl, dbUserName, dbPassword)
+        return new DataSourceConfig.Builder(dbUrl,dbUserName,dbPassword)
                 .schema("mybatis-plus") // 数据库 schema(部分数据库适用)
                 .keyWordsHandler(new MySqlKeyWordsHandler()); // 数据库关键字处理器
     }
@@ -59,8 +62,8 @@ public class MybatisPlusGenerationConfig {
      * @return
      */
     private GlobalConfig.Builder getGlobalConfigBuilder() {
-        String outputDirectory = config.getOutputDirectory();
-        String author = config.getAuthor();
+        String outputDirectory = generationConfig.getOutputDir();
+        String author = generationConfig.getAuthor();
         return new GlobalConfig.Builder()
                 .disableOpenDir() // 允许自动打开输出目录
                 .outputDir(outputDirectory) // 设置输出目录
@@ -74,18 +77,16 @@ public class MybatisPlusGenerationConfig {
      * 获取包配置
      * @return
      */
-    private PackageConfig.Builder getPackageConfigBuilder() {
-        String packagePath = config.getPackagePath();
-        String packageName = config.getPackageName();
+    private PackageConfig.Builder getPackageConfigBuilder(String packageName,String mouldName) {
         return new PackageConfig.Builder()
-                .parent(packagePath) // 设置父包名
-                .moduleName(packageName) // 设置父包模块名
-                .entity("pojo") // 设置 Entity 包名
-                .service("service") // 设置 Service 包名
-                .serviceImpl("service.impl") // 设置 Service Impl 包名
-                .mapper("mapper") // 设置 Mapper 包名
-                .xml("mapper") // 设置 Mapper XML 包名
-                .controller("controller"); // 设置 Controller 包名
+                .parent(packageName) // 设置父包名
+                .moduleName(mouldName) // 设置父包模块名
+                .entity(generationConfig.getEntityPackage()) // 设置 Entity 包名
+                .service(generationConfig.getServicePackage()) // 设置 Service 包名
+                .serviceImpl(generationConfig.getServiceImplPackage()) // 设置 Service Impl 包名
+                .mapper(generationConfig.getMapperPackage()) // 设置 Mapper 包名
+                .xml(generationConfig.getMapperXmlPackage()) // 设置 Mapper XML 包名
+                .controller(generationConfig.getControllerPackage()); // 设置 Controller 包名
     }
 
     /**
@@ -94,31 +95,26 @@ public class MybatisPlusGenerationConfig {
      * @return
      */
     private StrategyConfig getStrategyConfigBuilder(String tableName) {
-        String createTimeField = config.getCreateTimeField();
-        String updateTimeField = config.getUpdateTimeField();
-        String deleteFlagField = config.getDeleteFlagField();
-        String createByField = config.getCreateByField();
-        String updateByField = config.getUpdateByField();
         return new StrategyConfig.Builder()
                 .addInclude(tableName) // 设置要生成的表名
                 .enableCapitalMode() // 开启大写命名
                 .enableSkipView() // 开启跳过视图
                 .disableSqlFilter() // 禁用 SQL 过滤
                 .entityBuilder() // 实体策略
-                .logicDeleteColumnName(deleteFlagField)
+                .logicDeleteColumnName(generationConfig.getDeleteFlagField()) // 逻辑删除字段名
                 .enableFileOverride()
                 .enableLombok()
                 .enableTableFieldAnnotation()
-                .naming(NamingStrategy.underline_to_camel)
-                .columnNaming(NamingStrategy.underline_to_camel)
+                .naming(NamingStrategy.underline_to_camel) // 下划线转驼峰
+                .columnNaming(NamingStrategy.underline_to_camel) // 下划线转驼峰
                 .addTableFills(
-                        new Column(createTimeField, FieldFill.INSERT),
-                        new Column(updateTimeField, FieldFill.INSERT_UPDATE),
-                        new Column(createByField, FieldFill.INSERT),
-                        new Column(updateByField, FieldFill.INSERT_UPDATE)
+                        new Column(generationConfig.getCreateTimeField(), FieldFill.INSERT), // 自动填充创建时间
+                        new Column(generationConfig.getUpdateTimeField(), FieldFill.INSERT_UPDATE), // 自动填充更新时间
+                        new Column(generationConfig.getCreateByField(), FieldFill.INSERT), // 自动填充创建人
+                        new Column(generationConfig.getUpdateByField(), FieldFill.INSERT_UPDATE) // 自动填充更新人
                 )
                 .formatFileName("%s")
-                .javaTemplate("/templates/java/entity.java")
+                .javaTemplate(generationConfig.getEntityTemplatePath()) // 实体类模板路径
                 // .disable() // 禁用实体类生成
                 .serviceBuilder() // service 策略
                 .enableFileOverride()
@@ -126,8 +122,8 @@ public class MybatisPlusGenerationConfig {
                 .superServiceImplClass(ConstVal.SUPER_SERVICE_IMPL_CLASS)
                 .formatServiceFileName("%sService")
                 .formatServiceImplFileName("%sServiceImp")
-                .serviceTemplate("/templates/java/service.java")
-                .serviceImplTemplate("/templates/java/serviceImpl.java")
+                .serviceTemplate(generationConfig.getServiceTemplatePath()) // service 模板路径
+                .serviceImplTemplate(generationConfig.getServiceImplTemplatePath()) // service impl 模板路径
                 // .disableService() // 禁用 Service 层生成
                 .mapperBuilder() // mapper 策略
                 .enableFileOverride()
@@ -136,15 +132,15 @@ public class MybatisPlusGenerationConfig {
                 .enableBaseColumnList()
                 .formatMapperFileName("%sMapper")
                 .formatXmlFileName("%sMapper")
-                .mapperTemplate("/templates/java/mapper.java")
-                .mapperXmlTemplate("/templates/xml/mapper.xml")
+                .mapperTemplate(generationConfig.getMapperTemplatePath()) // mapper 模板路径
+                .mapperXmlTemplate(generationConfig.getMapperXmlTemplatePath()) // mapper xml 模板路径
                 .controllerBuilder() // controller 策略
-                .superClass(BaseController.class)
+                .superClass(BaseController.class) // 设置父类
                 .enableFileOverride()
                 .enableHyphenStyle()
                 .enableRestStyle()
                 .formatFileName("%sController")
-                .template("/templates/java/controller.java")
+                .template(generationConfig.getControllerTemplatePath())
                 .build();
     }
 
@@ -192,9 +188,9 @@ public class MybatisPlusGenerationConfig {
      * @param tableName
      * @return
      */
-    public ConfigBuilder getConfigBuilder(String tableName) {
+    private ConfigBuilder getConfigBuilder(String tableName,String packageName,String mouldName) {
         ConfigBuilder configBuilder = new ConfigBuilder(
-                this.getPackageConfigBuilder().build(),
+                this.getPackageConfigBuilder(packageName, mouldName).build(),
                 this.getDataSourceConfigBuilder().build(),
                 this.getStrategyConfigBuilder(tableName),
                 null,
@@ -203,16 +199,14 @@ public class MybatisPlusGenerationConfig {
         return configBuilder;
     }
 
-
-
     /**
      * 指定表代码生成
      * @param tableName
      */
-    public void generationCode(String tableName) {
+    public void generationCode(String tableName,String packageName,String mouldName) {
         new AutoGenerator(this.getDataSourceConfigBuilder().build())
                 .global(this.getGlobalConfigBuilder().build())
-                .packageInfo(this.getPackageConfigBuilder().build())
+                .packageInfo(this.getPackageConfigBuilder(packageName, mouldName).build())
                 .strategy(this.getStrategyConfigBuilder(tableName))
                 .injection(this.getInjectionConfigBuilder(tableName).build())
                 .execute(this.getTemplateEngine());
@@ -223,15 +217,10 @@ public class MybatisPlusGenerationConfig {
      * @param tableName
      * @return
      */
-    public Map<String,String> previewCode(String tableName) {
+    public Map<String,String> previewCode(String tableName,String packageName,String mouldName) {
         // 获取配置
-        ConfigBuilder configBuilder = new ConfigBuilder(
-                this.getPackageConfigBuilder().build(),
-                this.getDataSourceConfigBuilder().build(),
-                this.getStrategyConfigBuilder(tableName),
-                null,
-                this.getGlobalConfigBuilder().build(),
-                this.getInjectionConfigBuilder(tableName).build());
+        // ConfigBuilder configBuilder = this.getConfigBuilder(tableName,generationConfig.getPackageName(),generationConfig.getMouldName());
+        ConfigBuilder configBuilder = this.getConfigBuilder(tableName,packageName,mouldName);
         List<TableInfo> tableInfoList = configBuilder.getTableInfoList();
         TableInfo tableInfo = tableInfoList.get(0);
         Map<String, Object> objectMap = getObjectMap(configBuilder,tableInfo);
@@ -251,29 +240,32 @@ public class MybatisPlusGenerationConfig {
         return map;
     }
 
-    public static void main(String[] args)  throws Exception{
-        MybatisPlusGenerationConfig generationConfig = new MybatisPlusGenerationConfig();
-        // generationConfig.previewCode("users");
-        generationConfig.generationCode("users",null);
-    }
-
-    public byte[] downloadCode(String tableName) throws Exception {
+    /**
+     * 下载代码
+     * @param tableName
+     * @param packageName
+     * @param mouldName
+     * @return
+     * @throws Exception
+     */
+    public byte[] downloadCode(String tableName,String packageName,String mouldName) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(outputStream);
-        generationCode(tableName, zip);
+        generationDownloadCode(tableName, zip, packageName, mouldName);
         IOUtils.closeQuietly(zip);
         return outputStream.toByteArray();
     }
 
-    public void generationCode(String tableName, ZipOutputStream zip) {
+    /**
+     * 生成下载的代码
+     * @param tableName
+     * @param zip
+     * @param packageName
+     * @param mouldName
+     */
+    private void generationDownloadCode(String tableName, ZipOutputStream zip,String packageName,String mouldName) {
         // 获取配置
-        ConfigBuilder configBuilder = new ConfigBuilder(
-                this.getPackageConfigBuilder().build(),
-                this.getDataSourceConfigBuilder().build(),
-                this.getStrategyConfigBuilder(tableName),
-                null,
-                this.getGlobalConfigBuilder().build(),
-                this.getInjectionConfigBuilder(tableName).build());
+        ConfigBuilder configBuilder = this.getConfigBuilder(tableName,packageName,mouldName);
         String packagePath = configBuilder.getPackageConfig().getParent().replace(".", "/") + "/";
         String moduleName = configBuilder.getPackageConfig().getModuleName();
         List<TableInfo> tableInfoList = configBuilder.getTableInfoList();
@@ -361,7 +353,6 @@ public class MybatisPlusGenerationConfig {
                 zip.putNextEntry(new ZipEntry(customFile.getPackageName() +"/" + customFile.getFileName()));
                 IOUtils.write(writer.toString(), zip);
             }
-
             IOUtils.closeQuietly(writer);
             zip.flush();
             zip.closeEntry();
@@ -408,7 +399,7 @@ public class MybatisPlusGenerationConfig {
         return objectMap;
     }
 
-    public @NotNull VelocityEngine init(@NotNull ConfigBuilder configBuilder) {
+    private @NotNull VelocityEngine init(@NotNull ConfigBuilder configBuilder) {
             Properties p = new Properties();
             p.setProperty("UTF-8", ConstVal.UTF8);
             p.setProperty("resource.default_encoding", ConstVal.UTF8);

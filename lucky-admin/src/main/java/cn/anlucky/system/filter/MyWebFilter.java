@@ -28,7 +28,6 @@ public class MyWebFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // throw new CustomException("测试环境，禁止操作");
         filterChain.doFilter(request,response);
     }
 }

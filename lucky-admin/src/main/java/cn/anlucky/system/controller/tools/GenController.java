@@ -4,6 +4,7 @@ import cn.anlucky.system.annotation.Log;
 import cn.anlucky.system.base.controller.BaseController;
 import cn.anlucky.system.enums.BusinessType;
 import cn.anlucky.system.page.vo.PageDataVo;
+import cn.anlucky.system.pojo.tools.GenPo;
 import cn.anlucky.system.pojo.tools.TablePo;
 import cn.anlucky.system.service.tools.TablePoService;
 import cn.anlucky.vo.R;
@@ -11,6 +12,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -44,9 +46,9 @@ public class GenController extends BaseController {
      * @return
      */
     @SaCheckPermission("tools::gen::list")
-    @GetMapping("/previewCode/{tableName}")
-    public R previewCode(@PathVariable String tableName) {
-        return R.ok(tablePoService.previewCode(tableName));
+    @PostMapping("/previewCode")
+    public R previewCode(@RequestBody GenPo genPo) {
+        return R.ok(tablePoService.previewCode(genPo));
     }
 
 
@@ -58,9 +60,14 @@ public class GenController extends BaseController {
      */
     @SaCheckPermission("tools::gen::list")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
-    @GetMapping("/downloadCode/{tableName}")
-    public void downloadCode(HttpServletResponse response, @PathVariable String tableName) throws IOException {
-        byte[] data = tablePoService.downloadCode(tableName);
+    @GetMapping("/downloadCode")
+    public void downloadCode(HttpServletResponse response,
+                             @Param("tableName") String tableName,
+                             @Param("packageName") String packageName,
+                             @Param("mouldName") String mouldName
+    ) throws IOException {
+        GenPo genPo = new GenPo(tableName, packageName, mouldName);
+        byte[] data = tablePoService.downloadCode(genPo);
         genCode(response, data);
     }
 
@@ -76,5 +83,17 @@ public class GenController extends BaseController {
         response.setContentType("application/octet-stream; charset=UTF-8");
         IOUtils.write(data, response.getOutputStream());
     }
+
+    /**
+     * 获取代码生成的配置信息
+     * @return
+     */
+    @SaCheckPermission("tools::gen::list")
+    @GetMapping("/getGenPo")
+    public R getGenPo() {
+        return R.ok(tablePoService.getGenPo());
+    }
+
+
 
 }

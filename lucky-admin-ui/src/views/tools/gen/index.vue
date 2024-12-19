@@ -23,14 +23,19 @@
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
     </div>
-    <div v-permission="['tools::gen::export', 'tools::gen::list']" class="button-bar">
-      <el-button
-        v-permission="['tools::gen::export']"
-        :type="buttonBar.exportType"
-        :size="buttonBar.size"
-        :plain="buttonBar.plain"
-        @click="handleExport"
-      >导出</el-button>
+    <div v-permission="['tools::gen::list']" class="button-bar search-bar">
+      <div class="grid-item">
+        <span>
+          生成包:
+        </span>
+        <el-input v-model="genPo.packageName" placeholder="请输入包路径" style="width: 200px;" />
+      </div>
+      <div class="grid-item">
+        <span>
+          生成模块:
+        </span>
+        <el-input v-model="genPo.mouldName" placeholder="请输入模块名称" style="width: 200px;" />
+      </div>
       <el-button
         v-permission="['tools::gen::list']"
         :type="buttonBar.reFreshType"
@@ -38,6 +43,8 @@
         :plain="buttonBar.plain"
         @click="handleRefresh"
       >刷新</el-button>
+      <el-tag effect="plain" hit="true">{{ genPo.packageName + '.' + genPo.mouldName }}</el-tag>
+
     </div>
     <el-table
       v-loading.fullscreen.lock="tableLoading"
@@ -93,15 +100,8 @@
       />
     </div>
     <!-- 预览界面 -->
-    <el-dialog
-      :title="preview.title"
-      :visible.sync="preview.open"
-      width="80%"
-      top="5vh"
-      append-to-body
-    >
-      <el-tabs v-model="preview.activeName">
-        <p style="color: red;">后端代码请您手动修改包路径</p>
+    <el-dialog :title="preview.title" :visible.sync="preview.open" :close-on-click-modal="false" center>
+      <el-tabs v-model="preview.activeName" class="scrollbar">
         <el-tab-pane
           v-for="(value, key) in preview.data"
           :key="key"
@@ -115,7 +115,7 @@
             icon="el-icon-document-copy"
             style="float:right"
           >复制</el-link>
-          <pre class="scrollbar"><code class="hljs" v-html="highlightedCode(value, key)" /></pre>
+          <pre><code class="hljs" v-html="highlightedCode(value, key)" /></pre>
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -123,7 +123,7 @@
 </template>
 
 <script>
-import { tableList, previewCode } from '@/api/tools/gen'
+import { tableList, previewCode, downloadCode, getGenPo } from '@/api/tools/gen'
 import hljs from 'highlight.js/lib/core'
 import 'highlight.js/styles/github.css'
 hljs.registerLanguage('java', require('highlight.js/lib/languages/java'))
@@ -137,6 +137,13 @@ export default {
   data() {
     return {
       tableLoading: false,
+      // 代码生成配置
+      genPo: {
+        tableName: '',
+        packageName: 'cn.anlucky',
+        mouldName: 'system'
+      },
+      // 预览界面
       preview: {
         title: '',
         open: false,
@@ -161,6 +168,7 @@ export default {
       // 搜索条件
       searchForm: {
       },
+
       // 复选框选择的主键
       selectedIds: []
     }
@@ -178,10 +186,36 @@ export default {
   },
   created() {
     this.getTableData({}, this.currentPage, this.pageSize)
+    this.getGenPo()
   },
   methods: {
+    // 获取Redis中的GenPo
+    getGenPo() {
+      getGenPo().then(res => {
+        this.genPo = res.data
+      })
+    },
+    // 下载代码按钮被点击
     handleDownloadCode(row) {
-      window.open(process.env.VUE_APP_BASE_API + '/tools/gen/downloadCode/' + row.name)
+      this.genPo.tableName = row.name
+      if (this.validateGenPo(this.genPo)) {
+        downloadCode(this.genPo)
+      }
+    },
+    // 校验表单
+    validateGenPo(genPo) {
+      const requiredFields = [
+        { field: 'tableName', message: '请输入表名' },
+        { field: 'packageName', message: '请输入包名' },
+        { field: 'mouldName', message: '请输入模块名' }
+      ]
+      for (const { field, message } of requiredFields) {
+        if (!genPo[field] || genPo[field].trim() === '') {
+          this.$message.error(message)
+          return false
+        }
+      }
+      return true
     },
     /** 复制代码成功 */
     clipboardSuccess() {
@@ -197,14 +231,18 @@ export default {
     // 预览按钮被点击
     handlePreview(row) {
       console.log('row', row)
-      this.preview.title = row.name + '表生成代码预览'
-      this.preview.activeName = 'entity.java'
-      this.preview.open = true
-      this.getPreviewData(row.name)
+      if (this.validateGenPo(this.genPo)) {
+        this.preview.title = row.name + '表生成代码预览'
+        this.preview.activeName = 'entity.java'
+        this.preview.open = true
+        this.genPo.tableName = row.name
+        this.getPreviewData()
+      }
     },
+
     // 获取生成代码预览
-    getPreviewData(tableName) {
-      previewCode(tableName).then(res => {
+    getPreviewData() {
+      previewCode(this.genPo).then(res => {
         const { data } = res
         this.preview.data = data
       })
@@ -255,6 +293,7 @@ export default {
       this.handlePagination()
     },
     handlePagination() {
+      this.getGenPo()
       this.getTableData(this.searchForm, this.currentPage, this.pageSize)
     }
   }
@@ -265,7 +304,7 @@ export default {
 .scrollbar {
     overflow: auto;
     overflow-x: hidden;
-    max-height: 70vh;
+    max-height: 600px;
     padding: 10px 20px 0;
 }
 </style>
