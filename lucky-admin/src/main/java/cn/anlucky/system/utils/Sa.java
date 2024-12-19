@@ -4,6 +4,8 @@ import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 
+import java.util.List;
+
 /**
  * SaToken 个人封装的工具类
  */
@@ -67,6 +69,9 @@ public class Sa {
      */
     public static void logout() {
         StpUtil.logoutByTokenValue(getToken());
+    }
+    public static void logout(List<Long> userIds) {
+        userIds.forEach(StpUtil::logout);
     }
 
     /**

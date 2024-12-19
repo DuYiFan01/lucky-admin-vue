@@ -8,7 +8,10 @@ import cn.anlucky.system.exception.CustomException;
 import cn.anlucky.system.page.vo.PageDataVo;
 import cn.anlucky.system.pojo.system.Users;
 import cn.anlucky.system.service.system.UsersService;
+import cn.anlucky.system.utils.Sa;
+import cn.anlucky.utils.SaTokenDaoUtils;
 import cn.anlucky.vo.R;
+import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -122,6 +125,7 @@ public class UsersController extends BaseController {
             throw new CustomException("请选择要删除的数据");
         }
         usersService.removeBatchByIds(Arrays.asList(ids));
+        Sa.logout(ids);
         return R.ok("删除成功");
     }
 
