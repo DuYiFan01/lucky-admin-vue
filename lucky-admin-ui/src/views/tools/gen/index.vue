@@ -231,11 +231,11 @@ export default {
     // 预览按钮被点击
     handlePreview(row) {
       console.log('row', row)
+      this.genPo.tableName = row.name
       if (this.validateGenPo(this.genPo)) {
         this.preview.title = row.name + '表生成代码预览'
         this.preview.activeName = 'entity.java'
         this.preview.open = true
-        this.genPo.tableName = row.name
         this.getPreviewData()
       }
     },
