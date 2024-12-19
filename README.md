@@ -1,4 +1,8 @@
-# Lucky-Admin-Vue
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Lucky-Admin-Vue</h1>
+<h4 align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</h4>
+<p align="center">
+	<a href="https://gitee.com/xiaodu6/lucky-admin-vue/stargazers"><img src="https://gitee.com/xiaodu6/lucky-admin-vue/badge/star.svg?theme=dark"></a>
+</p>
 
 #### 介绍
 Lucky-Admin-Vue 一个基于vue-admin-template的后台管理框架，集成了动态角色权限，动态路由，日志管理，Sa-Token权限校验，快速构建一个管理后台的框架
@@ -96,8 +100,9 @@ src
 4. 打包前端项目 上传至服务器
 5. 修改后端 application.yml 文件中(spring.profiles.active = prod)
 6. 修改application-prod.yml文件中数据库配置
-7. 打包后端项目 上传至服务器
-8. 前端可配合Nginx进行反向代理
+7. 修改application-prod.yml文件中Redis配置
+8. 打包后端项目 上传至服务器
+9. 前端可配合Nginx进行反向代理
 
 ~~~ linux
     java -jar lucky-admin-vue.jar
@@ -122,12 +127,11 @@ src
 
 #### 待完善功能
 
-1. 合适位置集成Redis
-2. 集成定时任务功能
-3. 集成Excel导入导出
-4. 集成图片上传下载
-5. 增加用户头像修改、密码加密、登录逻辑优化
-6. 待添加......
+- 集成定时任务功能
+- 集成Excel导入导出
+- 集成图片上传下载
+- 增加用户头像修改、密码加密、登录逻辑优化
+- 待添加......
 
 #### 项目截图
 ![img.png](img.png)
@@ -138,3 +142,6 @@ src
 ![img_5.png](img_5.png)
 ![img_6.png](img_6.png)
 ![img_7.png](img_7.png)
+
+#### BUG交流群
+![qrcode_1734596802050.jpg](qrcode_1734596802050.jpg)

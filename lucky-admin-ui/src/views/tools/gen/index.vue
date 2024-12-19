@@ -43,7 +43,7 @@
         :plain="buttonBar.plain"
         @click="handleRefresh"
       >刷新</el-button>
-      <el-tag effect="plain" hit="true">{{ genPo.packageName + '.' + genPo.mouldName }}</el-tag>
+      <el-tag effect="plain">{{ genPo.packageName + '.' + genPo.mouldName }}</el-tag>
 
     </div>
     <el-table
