@@ -4,14 +4,13 @@ import cn.anlucky.system.exception.CustomException;
 import cn.anlucky.system.mapper.UsersMapper;
 import cn.anlucky.system.pojo.system.LoginLog;
 import cn.anlucky.system.pojo.system.Roles;
+import cn.anlucky.system.pojo.system.UserRoles;
 import cn.anlucky.system.pojo.system.Users;
 import cn.anlucky.system.service.system.LoginLogService;
 import cn.anlucky.system.service.system.LoginService;
 import cn.anlucky.system.service.system.MenusService;
-import cn.anlucky.system.utils.AddressUtils;
-import cn.anlucky.system.utils.IpUtils;
-import cn.anlucky.system.utils.Sa;
-import cn.anlucky.system.utils.ServletUtils;
+import cn.anlucky.system.service.system.UserRolesService;
+import cn.anlucky.system.utils.*;
 import cn.anlucky.system.vo.LoginVo;
 import cn.anlucky.system.vo.RouterVo;
 import cn.anlucky.system.vo.UserInfoVo;
@@ -24,6 +23,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.auth.login.LoginException;
 import java.time.LocalDateTime;
@@ -40,6 +40,8 @@ public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Autowired
     private MenusService menusServiceImpl;
 
+    @Autowired
+    private UserRolesService userRolesService;
     /**
      *
      * @description 用户登录
@@ -77,19 +79,24 @@ public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
 
         wrapper.eq(Users::getUsername, users.getUsername())
-                .eq(Users::getPassword, users.getPassword())
                 .last("limit 1");
+        Users one = this.getOne(wrapper);
 
-        users = this.getOne(wrapper);
-        if (users != null) {
-            SaLoginModel saLoginModel = Sa.setLoginParams("username", users.getUsername());
-            Sa.login(users.getId(),saLoginModel);
-            loginLog.setStatus("0");
-            loginLog.setMsg("登录成功");
-            loginLogService.saveLoginLog(loginLog);
-            return new LoginVo(users.getId(), users.getUsername(), Sa.getToken());
+        if (one == null){
+            throw new CustomException("用户名不存在");
         }
-        throw new CustomException("用户名或密码错误");
+        boolean matches = PasswordEncode.matches(users.getPassword(), one.getPassword());
+
+        if (!matches) {
+            throw new CustomException("用户名或密码错误");
+        }
+
+        SaLoginModel saLoginModel = Sa.setLoginParams("username", one.getUsername());
+        Sa.login(one.getId(),saLoginModel);
+        loginLog.setStatus("0");
+        loginLog.setMsg("登录成功");
+        loginLogService.saveLoginLog(loginLog);
+        return new LoginVo(one.getId(), one.getUsername(), Sa.getToken());
     }
 
     /**
@@ -98,6 +105,7 @@ public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * @param users
      * @return
      */
+    @Transactional
     @Override
     public Users register(Users users) {
         if (users == null) {
@@ -114,7 +122,15 @@ public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         if (this.getOne(new LambdaQueryWrapper<Users>().eq(Users::getUsername, users.getUsername())) != null) {
             throw new CustomException("用户名已存在");
         }
+        String password = PasswordEncode.encode(users.getPassword());
+        users.setPassword(password);
         this.save(users);
+        // 注册成功添加默认角色
+        UserRoles userRoles = new UserRoles();
+        userRoles.setUserId(users.getId());
+        // 角色ID 为 2 是普通用户的权限，相关角色参考为 user_role 表
+        userRoles.setRoleId(2L);
+        userRolesService.save(userRoles);
         return users;
     }
 
@@ -161,17 +177,17 @@ public class LoginServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             throw new CustomException("参数不能为空");
         }
 
-        LambdaUpdateWrapper<Users> wrapper = new LambdaUpdateWrapper<>();
+        LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
         // 通过ID和旧密码去更新一个用户的密码，若更新成功则该用户输入的旧密码是正确的，否则就是错误的
-        wrapper.eq(Users::getId, loginId)
-                .eq(Users::getPassword, oldPassword)
-                .set(Users::getPassword, newPassword);
-
-        int i = this.baseMapper.update(wrapper);
-
-        if (i == 0) {
+        wrapper.eq(Users::getId, loginId);
+        Users users = this.getOne(wrapper);
+        if (!PasswordEncode.matches(oldPassword, users.getPassword())){
             throw new CustomException("旧密码输入错误");
         }
+        LambdaUpdateWrapper<Users> userUpdate = new LambdaUpdateWrapper<>();
+        userUpdate.eq(Users::getId, loginId)
+                .set(Users::getPassword, PasswordEncode.encode(newPassword));
+        this.baseMapper.update(userUpdate);
         Sa.logout();
     }
 

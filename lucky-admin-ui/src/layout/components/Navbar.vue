@@ -39,13 +39,13 @@
     >
       <el-form ref="updatePassword.form" :model="updatePassword.form" status-icon :rules="updatePassword.rules">
         <el-form-item label="密码" prop="oldPassword">
-          <el-input v-model="updatePassword.form.oldPassword" type="text" />
+          <el-input v-model.trim="updatePassword.form.oldPassword" type="text" />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="updatePassword.form.newPassword" type="text" />
+          <el-input v-model.trim="updatePassword.form.newPassword" type="text" />
         </el-form-item>
         <el-form-item label="确认新密码" prop="checkNewPassword">
-          <el-input v-model="updatePassword.form.checkNewPassword" type="text" />
+          <el-input v-model.trim="updatePassword.form.checkNewPassword" type="text" />
         </el-form-item>
         <el-form-item style="text-align: center;">
           <el-button type="primary" @click="submitForm('updatePassword.form')">提交</el-button>

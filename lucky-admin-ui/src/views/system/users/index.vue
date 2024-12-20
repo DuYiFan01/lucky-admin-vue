@@ -36,7 +36,7 @@
       <el-table-column type="index" width="50" label="序号" v-bind="columnProps" />
       <!-- <el-table-column prop="id" label="用户ID" v-bind="columnProps" /> -->
       <el-table-column prop="username" label="用户名" v-bind="columnProps" />
-      <el-table-column prop="password" label="密码" v-bind="columnProps" />
+      <!-- <el-table-column prop="password" label="密码" v-bind="columnProps" /> -->
       <el-table-column prop="email" label="邮箱" v-bind="columnProps" />
       <el-table-column prop="createTime" label="创建时间" v-bind="columnProps" />
       <el-table-column prop="createBy" label="创建人" v-bind="columnProps" />
@@ -72,10 +72,10 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="500px" :close-on-click-modal="false" center>
       <el-form ref="form" :model="form" :rules="rules">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" autocomplete="off" />
+          <el-input v-model.trim="form.username" autocomplete="off" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" autocomplete="off" />
+          <el-input v-model.trim="form.password" autocomplete="off" />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" autocomplete="off" />
@@ -178,9 +178,6 @@ export default {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
-        ],
         email: [
           { required: true, message: '请输入邮箱', trigger: 'blur' }
         ]
@@ -258,6 +255,7 @@ export default {
       this.dialogTitle = '编辑'
       this.dialogType = 'update'
       this.form = { ...row }
+      this.form.password = null
       this.dialogVisible = true
     },
     // 删除按钮被点击

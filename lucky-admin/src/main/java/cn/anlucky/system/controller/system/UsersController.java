@@ -7,11 +7,10 @@ import cn.anlucky.system.enums.BusinessType;
 import cn.anlucky.system.exception.CustomException;
 import cn.anlucky.system.page.vo.PageDataVo;
 import cn.anlucky.system.pojo.system.Users;
+import cn.anlucky.system.service.system.LoginService;
 import cn.anlucky.system.service.system.UsersService;
 import cn.anlucky.system.utils.Sa;
-import cn.anlucky.utils.SaTokenDaoUtils;
 import cn.anlucky.vo.R;
-import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +31,8 @@ import java.util.List;
 public class UsersController extends BaseController {
 
     private final UsersService usersService;
+
+    private final LoginService loginService;
 
     /**
      * 查询所有
@@ -82,7 +83,7 @@ public class UsersController extends BaseController {
         if(usersService.getById(users.getId())!=null){
             throw new CustomException("ID已存在");
         }
-        usersService.save(users);
+        loginService.register(users);
         return R.ok("添加成功");
     }
 
